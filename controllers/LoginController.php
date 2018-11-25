@@ -7,7 +7,7 @@ use yii\web\Controller;
 
 class LoginController extends Controller
 {
-    public $layout = 'login';
+  //  public $layout = 'login';
 
 
     public function actionIndex()

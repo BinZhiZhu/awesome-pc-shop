@@ -30,8 +30,10 @@ AppAsset::register($this);
             overflow-y: hidden;
         }
         .login-box{
+            position: relative;
+            top: 70px;
             text-align: center;
-            margin: 50px auto;
+            margin: 0 auto;
             width: 300px;
         }
 
@@ -39,42 +41,50 @@ AppAsset::register($this);
             padding: 15px;
         }
 
-        .user-login-form {
-
-        }
-
     </style>
 </head>
 <body>
 <?php $this->beginBody() ?>
-<div class="login-box" id="app">
-    <template>
-        <div class="user-login-header">
-            <h2>ElementuiAdmin</h2>
-            <p>基于Vue+Element-ui实现的后台管理系统</p>
-        </div>
-    </template>
-    <template>
-        <div class="user-login-form">
-            <el-form :model="loginForm" status-icon :rules="loginRules" ref="loginForm" label-width="68px">
-                <el-form-item label="账号" prop="username">
-                    <el-input type="text" v-model="loginForm.username"></el-input>
-                </el-form-item>
-                <el-form-item label="密码" prop="password">
-                    <el-input type="password" v-model="loginForm.password"></el-input>
-                </el-form-item>
-                <el-form-item label="确认密码" prop="checkPass">
-                    <el-input type="password" v-model="loginForm.checkPass"></el-input>
-                </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" @click="submitForm('loginForm')">登录</el-button>
-                    <el-button @click="resetForm('loginForm')">重置</el-button>
-                </el-form-item>
-            </el-form>
-        </div>
-    </template>
-
+<div class="wrap" >
+    <div class="login-box"  id="app">
+        <template>
+            <div class="user-login-header">
+                <h2>ElementuiAdmin</h2>
+                <p>基于Vue+Element-ui实现的后台管理系统</p>
+            </div>
+        </template>
+        <template>
+            <div class="user-login-form">
+                <el-form :model="loginForm" status-icon :rules="loginRules" ref="loginForm" label-width="68px">
+                    <el-form-item label="账号" prop="username">
+                        <el-input type="text" v-model="loginForm.username"></el-input>
+                    </el-form-item>
+                    <el-form-item label="密码" prop="password">
+                        <el-input type="password" v-model="loginForm.password"></el-input>
+                    </el-form-item>
+                    <el-form-item label="确认密码" prop="checkPass">
+                        <el-input type="password" v-model="loginForm.checkPass"></el-input>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button type="primary" @click="submitForm('loginForm')">登录</el-button>
+                        <el-button @click="resetForm('loginForm')">重置</el-button>
+                    </el-form-item>
+                </el-form>
+            </div>
+        </template>
+    </div>
 </div>
+<footer class="footer">
+    <div class="container">
+        <p class="pull-left"><a href="http://www.binzhizhu.top">&copy; BinZhiZhu <?= date('Y') ?></a></p>
+        <p class="pull-right">
+            <span>技术支持 |</span>
+            <a href="http://www.yiiframework.com">Yii框架 |</a>
+            <a href="https://cn.vuejs.org">VueJs |</a>
+            <a href="http://element-cn.eleme.io">Element-ui</a>
+        </p>
+    </div>
+</footer>
 <script>
     new Vue({
         el: '#app',
@@ -142,7 +152,7 @@ AppAsset::register($this);
         methods: {
             //提交表单
             submitForm(formName) {
-               // let formData = this.loginForm;
+                // let formData = this.loginForm;
                 //formData = JSON.stringify(formData);
                 let loginUrl = '<?php echo Yii::$app->urlManager->createUrl('login/login');?>'
                 this.$refs[formName].validate((valid) => {
@@ -150,7 +160,7 @@ AppAsset::register($this);
                         console.log('res',valid)
                         //todo  接口
                         console.log('--登录接口--')
-                       // alert('别催，再撸接口了！');
+                        // alert('别催，再撸接口了！');
                         const postdata = {
                             username:this.loginForm.username,
                             password:this.loginForm.password,
@@ -179,6 +189,7 @@ AppAsset::register($this);
         }
     });
 </script>
+
 <?php $this->endBody() ?>
 </body>
 </html>
