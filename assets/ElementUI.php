@@ -32,7 +32,7 @@ class ElementUI extends AssetBundle
 
 
     public $depends = [
-        Vuejs::class,
+        VueJs::class,
         JqueryAsset::class,
     ];
 

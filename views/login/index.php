@@ -177,6 +177,7 @@ AppAsset::register($this);
                         axios.post(loginUrl, param)
                             .then(response => {
                                 console.log('success', response);
+                                alert('别催啦~~ 正在开发中~~')
                                 let res = response.data;
                                 alert(res.message);
                             })
@@ -184,7 +185,6 @@ AppAsset::register($this);
                                 console.log('error', error);
                                 let res = error.data;
                                 //  alert(res.message)
-                                alert('别催啦~~ 正在开发中~~')
                             });
                     } else {
                         console.log('error submit!!');
