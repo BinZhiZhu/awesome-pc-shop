@@ -1,12 +1,14 @@
 <?php
 
 /* @var $this \yii\web\View */
+$this->title = 'Admin管理系统';
+
 /* @var $content string */
 
 use yii\helpers\Html;
 use app\assets\AppAsset;
 use app\assets\ElementUI;
-use yii\bootstrap\ActiveForm;
+
 ElementUI::register($this);
 AppAsset::register($this);
 ?>
@@ -19,6 +21,7 @@ AppAsset::register($this);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?php $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
+    <link rel="shortcut icon" href="<?php echo Yii::$app->getHomeUrl(); ?>/favicon.ico" type="image/x-icon"/>
     <?php $this->head() ?>
     <style>
         *{margin: 0px;padding: 0px;}
@@ -27,33 +30,50 @@ AppAsset::register($this);
             overflow-y: hidden;
         }
         .login-box{
-            position: relative;
-            left: 32%;
-            top: 25%;
-            width: 400px;
-            height: 200px;
-            /*margin-left: 32%;*/
+            text-align: center;
+            margin: 50px auto;
+            width: 300px;
         }
+
+        .user-login-header {
+            padding: 15px;
+        }
+
+        .user-login-form {
+
+        }
+
     </style>
 </head>
 <body>
 <?php $this->beginBody() ?>
 <div class="login-box" id="app">
-    <el-form :model="loginForm" status-icon :rules="loginRules" ref="loginForm" label-width="100px">
-        <el-form-item label="账号" prop="username">
-            <el-input type="text" v-model="loginForm.username"></el-input>
-        </el-form-item>
-        <el-form-item label="密码" prop="password">
-            <el-input type="password" v-model="loginForm.password"></el-input>
-        </el-form-item>
-        <el-form-item label="确认密码" prop="checkPass">
-            <el-input type="password" v-model="loginForm.checkPass"></el-input>
-        </el-form-item>
-        <el-form-item>
-            <el-button type="primary" @click="submitForm('loginForm')">提交</el-button>
-            <el-button @click="resetForm('loginForm')">重置</el-button>
-        </el-form-item>
-    </el-form>
+    <template>
+        <div class="user-login-header">
+            <h2>ElementuiAdmin</h2>
+            <p>基于Vue+Element-ui实现的后台管理系统</p>
+        </div>
+    </template>
+    <template>
+        <div class="user-login-form">
+            <el-form :model="loginForm" status-icon :rules="loginRules" ref="loginForm" label-width="68px">
+                <el-form-item label="账号" prop="username">
+                    <el-input type="text" v-model="loginForm.username"></el-input>
+                </el-form-item>
+                <el-form-item label="密码" prop="password">
+                    <el-input type="password" v-model="loginForm.password"></el-input>
+                </el-form-item>
+                <el-form-item label="确认密码" prop="checkPass">
+                    <el-input type="password" v-model="loginForm.checkPass"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="submitForm('loginForm')">登录</el-button>
+                    <el-button @click="resetForm('loginForm')">重置</el-button>
+                </el-form-item>
+            </el-form>
+        </div>
+    </template>
+
 </div>
 <script>
     new Vue({
