@@ -12,6 +12,9 @@ $config = [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
     ],
+    'modules' => [
+        'api' => modules\api\Module::class,
+    ],
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
@@ -55,14 +58,9 @@ $config = [
         ],
         */
     ],
-    'modules'=>[
-        'web'=>[
-            'class'=>''
-        ]
-    ],
     'params' => $params,
-    //  'defaultRoute'=>'login'
-    'layout' => 'login',
+    'defaultRoute' => 'login',
+    // 'layout' => 'login',
 ];
 
 if (YII_ENV_DEV) {
