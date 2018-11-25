@@ -4,9 +4,10 @@ $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
 $config = [
-    'id' => 'basic',
+    'id' => 'com.binzhizhu.demo',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
+    'language'=>'zh-CN',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
@@ -14,8 +15,10 @@ $config = [
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
+            'enableCsrfValidation'=>false, //取消enableCookieValidation的验证  隐藏表单的_csrf
             'cookieValidationKey' => '33VvOVnAPHPR6oqvzlbpa4J_ryENWIBJ',
         ],
+
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
@@ -24,7 +27,7 @@ $config = [
             'enableAutoLogin' => true,
         ],
         'errorHandler' => [
-            'errorAction' => 'site/error',
+        //    'errorAction' => 'site/error',
         ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
@@ -52,7 +55,13 @@ $config = [
         ],
         */
     ],
+    'modules'=>[
+        'web'=>[
+            'class'=>''
+        ]
+    ],
     'params' => $params,
+    'defaultRoute'=>'login'
 ];
 
 if (YII_ENV_DEV) {
