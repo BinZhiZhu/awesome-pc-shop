@@ -20,7 +20,7 @@ AppAsset::register($this);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?php $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
-    <link rel="shortcut icon" href="<?php echo Yii::$app->getHomeUrl(); ?>/favicon.ico" type="image/x-icon"/>
+    <link rel="shortcut icon" href="<?php echo Yii::$app->request->getHostName(); ?>/favicon.ico" type="image/x-icon"/>
     <?php $this->head() ?>
     <style>
         * {

@@ -15,10 +15,8 @@ class LoginController extends Controller
     public function actionIndex()
     {
         Yii::$app->view->title = 'Admin管理系统';
-        $host = Yii::$app->request->getAbsoluteUrl();//绝对路径
-        return $this->render('index',[
-            'host' => $host
-        ]);
+        //   $host = Yii::$app->request->getAbsoluteUrl();//绝对路径
+        return $this->render('index');
     }
 
     /**
