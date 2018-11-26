@@ -16,6 +16,7 @@ use Yii;
  * @property int $lastvisit_time 最后一次访问时间
  * @property string $lastvisit_ip 最后一次访问ip
  * @property int $register_time 注册时间
+ * @property int $login_count 登录次数
  */
 class DevUsers extends \yii\db\ActiveRecord
 {
@@ -33,7 +34,7 @@ class DevUsers extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['status', 'lastvisit_time', 'register_time'], 'integer'],
+            [['status', 'lastvisit_time', 'register_time', 'login_count'], 'integer'],
             [['username'], 'string', 'max' => 50],
             [['password', 'salt', 'register_ip', 'lastvisit_ip'], 'string', 'max' => 20],
         ];
@@ -54,6 +55,7 @@ class DevUsers extends \yii\db\ActiveRecord
             'lastvisit_time' => 'Lastvisit Time',
             'lastvisit_ip' => 'Lastvisit Ip',
             'register_time' => 'Register Time',
+            'login_count' => 'Login Count'
         ];
     }
 }
