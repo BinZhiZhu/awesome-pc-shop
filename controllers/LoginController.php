@@ -3,7 +3,6 @@
 namespace app\controllers;
 
 use app\models\DevUsers;
-use app\common\Request;
 use yii\web\Controller;
 use Exception;
 use Yii;
@@ -16,6 +15,7 @@ class LoginController extends Controller
     public function actionIndex()
     {
         Yii::$app->view->title = '系统登录页面';
+        Yii::$app->setHomeUrl('/');
 
         $name = 'xxx';
 
@@ -26,7 +26,7 @@ class LoginController extends Controller
 
     /**
      *  用户登录
-     * @return array
+     * @return object
      * @throws Exception
      */
     public function actionLogin()
