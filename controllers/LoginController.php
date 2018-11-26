@@ -79,7 +79,8 @@ class LoginController extends Controller
         $user_data = [
             'username' => $username,
             'password' => $password,
-            'salt' => $hash_password,
+            'salt' => '',
+            'hash_pwd' => $hash_password,
             'status' => 1,
             'register_ip' => Yii::$app->request->getUserIP(),
             'register_time' => time(),
