@@ -17,6 +17,7 @@ use Yii;
  * @property string $lastvisit_ip 最后一次访问ip
  * @property int $register_time 注册时间
  * @property int $login_count 登录次数
+ * @property int $hash_pwd 加密密码
  */
 class DevUsers extends \yii\db\ActiveRecord
 {
@@ -37,6 +38,7 @@ class DevUsers extends \yii\db\ActiveRecord
             [['status', 'lastvisit_time', 'register_time', 'login_count'], 'integer'],
             [['username'], 'string', 'max' => 50],
             [['password', 'salt', 'register_ip', 'lastvisit_ip'], 'string', 'max' => 20],
+            [['hash_pwd'], 'string'],
         ];
     }
 
@@ -55,7 +57,8 @@ class DevUsers extends \yii\db\ActiveRecord
             'lastvisit_time' => 'Lastvisit Time',
             'lastvisit_ip' => 'Lastvisit Ip',
             'register_time' => 'Register Time',
-            'login_count' => 'Login Count'
+            'login_count' => 'Login Count',
+            'hash_pwd0' => 'Hash Pwd'
         ];
     }
 }

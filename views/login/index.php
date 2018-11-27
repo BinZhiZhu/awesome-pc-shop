@@ -20,12 +20,12 @@ AppAsset::register($this);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?php $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
-    <link rel="shortcut icon" href="<?php echo Yii::$app->request->getHostName(); ?>/favicon.ico" type="image/x-icon"/>
+    <link rel="shortcut icon" href="<?=$host  ?>/favicon.ico" type="image/x-icon"/>
     <?php $this->head() ?>
     <style>
         * {
-            margin: 0px;
-            padding: 0px;
+            margin: 0;
+            padding: 0;
         }
 
         #app, body, html {
@@ -38,7 +38,7 @@ AppAsset::register($this);
         }
 
         .login {
-            background-image: url("<?php $host ?> /images/bg1.jpg");
+            background-image: url("<?php $host ?> /images/bg.png");
             width: 100%;
             background-position: 50%;
             background-size: cover; /*铺满*/
@@ -49,9 +49,9 @@ AppAsset::register($this);
 
         .login-box {
             color: #ffffff !important;
-            position: absolute;
+            position: relative;
             transform: translateY(-60%);
-            right: 160px;
+            right: 35px;
             top: 50%;
             margin: 0 auto;
             width: 300px;
@@ -59,22 +59,24 @@ AppAsset::register($this);
 
         .user-login-form {
             position: relative;
-            right: -5px;
+            right: 20px;
             top: 20px;
         }
         .user-login-header {
             position: relative;
-            right: -50px;
+            right: -30px;
             padding: 15px;
         }
 
         .login-btn {
             position: relative;
-            right: -30px;
+            width: 300px;
         }
 
         .dev-process {
+            display: none;
             position: relative;
+            width: 150px;
             left: 30px;
             top: 40%;
         }
@@ -98,12 +100,12 @@ AppAsset::register($this);
             </template>
             <template>
                 <div class="user-login-form">
-                    <el-form :model="loginForm" status-icon :rules="loginRules" ref="loginForm" label-width="70px">
+                    <el-form :model="loginForm" status-icon :rules="loginRules" ref="loginForm" label-width="100px">
                         <el-form-item label="账号" prop="username">
-                            <el-input type="text" v-model="loginForm.username"></el-input>
+                            <el-input type="text" v-model="loginForm.username" autocomplete="off"></el-input>
                         </el-form-item>
                         <el-form-item label="密码" prop="password">
-                            <el-input type="password" v-model="loginForm.password"></el-input>
+                            <el-input type="password" v-model="loginForm.password" autocomplete="off"></el-input>
                         </el-form-item>
                         <el-form-item label="确认密码" prop="checkPass">
                             <el-input type="password" v-model="loginForm.checkPass"></el-input>
@@ -120,9 +122,9 @@ AppAsset::register($this);
                 </div>
             </template>
         </div>
-        <div class="dev-process">
+        <div class="dev-process" >
             <template>
-                <el-tooltip class="item" effect="light" :content="tooltip" placement="top-start">
+                <el-tooltip class="item" effect="light" :content="tooltip" placement="top-start" width="150px">
                     <el-progress type="circle" :percentage="percentage" stroke-width="8"></el-progress>
                 </el-tooltip>
             </template>
@@ -146,6 +148,37 @@ AppAsset::register($this);
     new Vue({
         el: '#app',
         data() {
+            //定义校验规则 validate
+            var validateUsername = (rule, value, callback) => {
+                if (value === '') {
+                    callback(new Error('请输入账号'));
+                } else if (value.length < 5) {
+                    callback(new Error('账号不能少于六位数'));
+                    //todo  可以加正则匹配 账号只能是字母+数字组合
+                } else {
+                    //todo 规则
+                    callback();
+                }
+            };
+            var validatePassword= (rule, value, callback) => {
+                if (value === '') {
+                    callback(new Error('请输入密码'));
+                } else {
+                    if (this.loginForm.checkPass !== '') {
+                        this.$refs.loginForm.validateField('checkPass');
+                    }
+                    callback();
+                }
+            };
+            var validateCheckPass = (rule, value, callback) => {
+                if (value === '') {
+                    callback(new Error('请再次输入密码'));
+                } else if (value !== this.loginForm.password) {
+                    callback(new Error('两次输入密码不一致!'));
+                } else {
+                    callback();
+                }
+            };
             return {
                 loginForm: {
                     username: '',
@@ -177,38 +210,6 @@ AppAsset::register($this);
                     ],
                 }
             };
-
-            //定义校验规则 validate
-            var validateUsername = (rule, value, callback) => {
-                if (value === '') {
-                    callback(new Error('请输入账号'));
-                } else if (value.length < 5) {
-                    callback(new Error('账号不能少于六位数'));
-                    //todo  可以加正则匹配 账号只能是字母+数字组合
-                } else {
-                    //todo 规则
-                    callback();
-                }
-            };
-            var validatePassword = (rule, value, callback) => {
-                if (value === '') {
-                    callback(new Error('请输入密码'));
-                } else {
-                    if (this.loginForm.checkPass !== '') {
-                        this.$refs.loginForm.validateField('checkPass');
-                    }
-                    callback();
-                }
-            };
-            var validateCheckPass = (rule, value, callback) => {
-                if (value === '') {
-                    callback(new Error('请再次输入密码'));
-                } else if (value !== this.loginForm.password) {
-                    callback(new Error('两次输入密码不一致!'));
-                } else {
-                    callback();
-                }
-            };
         },
         methods: {
             //登入成功提示
@@ -217,6 +218,14 @@ AppAsset::register($this);
                     title: '登入成功',
                     message: '后台正在开发中~敬请期待~',
                     type: 'success'
+                });
+            },
+
+            alertMessage(msg,close,type) {
+                this.$message({
+                    showClose: close,
+                    message: msg,
+                    type: type
                 });
             },
 
@@ -232,35 +241,37 @@ AppAsset::register($this);
             submitForm(formName) {
                 // let formData = this.loginForm;
                 //formData = JSON.stringify(formData);
-                let loginUrl = '<?php echo Yii::$app->urlManager->createUrl('login/login');?>'
+                let loginUrl = '<?php echo Yii::$app->urlManager->createUrl('login/login');?>';
+                const postdata = {
+                    username: this.loginForm.username,
+                    password: this.loginForm.password,
+                };
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         console.log('res', valid)
                         //todo  接口
                         console.log('--登录接口--')
-                        const postdata = {
-                            username: this.loginForm.username,
-                            password: this.loginForm.password,
-                        };
-
                         let param = new URLSearchParams();
                         param.append('username', postdata.username);
                         param.append('password', postdata.password);
                         axios.post(loginUrl, param)
                             .then(response => {
                                 console.log('success', response);
-                                // alert('别催啦~~ 正在开发中~~')
-                                this.loginSuccess();
+                                if(response.data.code === 100){
+                                    this.loginSuccess();
+                                }else if (response.data.code= -101){
+                                    this.alertMessage('密码错误',true,'error');
+                                }
                                 // let res = response.data;
                                 // alert(res.message);
                             })
                             .catch(error => {
-                                console.log('error', error);
-                                let res = error.data;
-                                //  alert(res.message)
+                                console.log(error)
                             });
                     } else {
-                        console.log('error submit!!');
+                        console.log('res', valid)
+                        console.log('--data--',postdata)
+
                         return false;
                     }
                 });

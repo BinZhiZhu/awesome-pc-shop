@@ -25,7 +25,7 @@ class m181125_131656_add_user_table extends Migration
                 'lastvisit_ip' => $this->string(20)->notNull()->defaultValue('')->comment('最后一次访问ip'),
                 'register_time' => $this->integer(10)->notNull()->defaultValue(0)->comment('注册时间'),
                 'login_count' => $this->integer(11)->defaultValue(0)->comment('登入次数'),
-                'hash_pwd' => $this->text()->comment('加密后的hash')
+//                'hash_pwd' => $this->text()->comment('加密后的hash')
             ], $tableOptions);
         }
 
