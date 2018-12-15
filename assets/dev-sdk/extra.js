@@ -1,6 +1,4 @@
 
-if (window.jutouSdk) {
-
     /**
      * 调用本地的json-rpc接口
      *
@@ -19,7 +17,7 @@ if (window.jutouSdk) {
             jsonrpc: '2.0',
             method: method,
             params: params,
-            id: window.jutouSdkGenerateUUID()
+            id: window.devSdkGenerateUUID()
         };
 
         $.ajax({
@@ -52,7 +50,7 @@ if (window.jutouSdk) {
      * @param title
      * @param callback
      */
-    window.jutouSdk.alert = function (text, title, callback) {
+    window.devSdk.alert = function (text, title, callback) {
         if (typeof $.alert === 'function') {
             $.alert(text, title, callback);
             return;
@@ -98,7 +96,7 @@ if (window.jutouSdk) {
      * @param ok
      * @param cancel
      */
-    window.jutouSdk.confirm = function (message, ok, cancel) {
+    window.devSdk.confirm = function (message, ok, cancel) {
         // TODO 兼容多端
         $.confirm(message, ok, cancel);
     };
@@ -109,14 +107,14 @@ if (window.jutouSdk) {
      * @param content
      * @param url
      */
-    window.jutouSdk.toast = function (content, url) {
+    window.devSdk.toast = function (content, url) {
         if (window.layui !== undefined) {
             layui.use('layer', function () {
                 var layer = layui.layer;
                 layer.msg(content);
                 if (url !== undefined) {
                     setTimeout(function () {
-                        jutouSdk.redirect(url);
+                        devSdk.redirect(url);
                     }, 2000);
                 }
             });
@@ -132,7 +130,7 @@ if (window.jutouSdk) {
     /**
      * 刷新页面
      */
-    window.jutouSdk.reload = function () {
+    window.devSdk.reload = function () {
         location.reload();
     };
 
@@ -141,10 +139,9 @@ if (window.jutouSdk) {
      *
      * @param url
      */
-    window.jutouSdk.redirect = function (url) {
+    window.devSdk.redirect = function (url) {
         if (url !=='' && url !== undefined )
         {
             window.location.href = url;
         }
     };
-}

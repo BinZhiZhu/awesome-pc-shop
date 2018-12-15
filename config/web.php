@@ -13,7 +13,7 @@ $config = [
         '@npm'   => '@vendor/npm-asset',
     ],
     'modules' => [
-        'api' => modules\api\Module::class,
+        'api' => 'app\modules\api\Module',
     ],
     'components' => [
         'request' => [

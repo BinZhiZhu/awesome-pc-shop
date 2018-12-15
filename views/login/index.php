@@ -132,21 +132,17 @@ AppAsset::register($this);
 
     </div>
 </div>
-<!--<footer class="footer">-->
-<!--    <div class="container">-->
-<!--        <p class="pull-left"><a href="http://www.binzhizhu.top">&copy; BinZhiZhu -->
-<? //= date('Y') ?><!--</a></p>-->
-<!--        <p class="pull-right">-->
-<!--            <span>技术支持 |</span>-->
-<!--            <a href="http://www.yiiframework.com">Yii框架 |</a>-->
-<!--            <a href="https://cn.vuejs.org">VueJs |</a>-->
-<!--            <a href="http://element-cn.eleme.io">Element-ui</a>-->
-<!--        </p>-->
-<!--    </div>-->
-<!--</footer>-->
 <script>
+    axios.defaults.baseURL = "";
+    const router = new VueRouter({
+        routes: [
+            {path : '/site',  name: 'indexPage'},
+        ]
+    });
+
     new Vue({
         el: '#app',
+        router,
         data() {
             //定义校验规则 validate
             var validateUsername = (rule, value, callback) => {
@@ -241,7 +237,7 @@ AppAsset::register($this);
             submitForm(formName) {
                 // let formData = this.loginForm;
                 //formData = JSON.stringify(formData);
-                let loginUrl = '<?php echo Yii::$app->urlManager->createUrl('login/login');?>';
+                let loginUrl = '<?php echo \yii\helpers\Url::toRoute('login/login');?>';
                 const postdata = {
                     username: this.loginForm.username,
                     password: this.loginForm.password,
@@ -259,11 +255,13 @@ AppAsset::register($this);
                                 console.log('success', response);
                                 if(response.data.code === 100){
                                     this.loginSuccess();
+                                     // this.$router.push({path:'site/index'});
+                                     // window.location.href = 'http://binzhizhu.top';
+                                    let link = '<?php echo \yii\helpers\Url::to(['site/index'])?>';
+                                    window.location.href = link;
                                 }else if (response.data.code= -101){
                                     this.alertMessage('密码错误',true,'error');
                                 }
-                                // let res = response.data;
-                                // alert(res.message);
                             })
                             .catch(error => {
                                 console.log(error)
