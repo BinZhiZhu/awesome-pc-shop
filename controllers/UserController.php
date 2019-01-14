@@ -7,7 +7,7 @@ use yii\web\Controller;
 use Exception;
 use Yii;
 
-class LoginController extends Controller
+class UserController extends Controller
 {
 
     public $layout = false;

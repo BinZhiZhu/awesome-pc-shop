@@ -59,8 +59,8 @@ $config = [
         */
     ],
     'params' => $params,
-    'defaultRoute' => 'login',
-    // 'layout' => 'login',
+    'defaultRoute' => 'user',
+//     'layout' =>false,
 ];
 
 //if (YII_ENV_DEV) {
@@ -77,6 +77,20 @@ $config = [
         'class' => 'yii\gii\Module',
         // uncomment the following to add your IP if you are not connecting from localhost.
         //'allowedIPs' => ['127.0.0.1', '::1'],
+        'generators' => [ //这里配置生成器
+//            'myCrud' => [ // 生成器名称
+//                'class' => 'app\myTemplates\crud\Generator', // 生成器类
+//                'templates' => [ //配置模版文件
+//                    'my' => '@app/myTemplates/crud/default', // 模版名称 => 模版路径
+//                ]
+//            ],
+            'modelCest' => [ // 生成器名称
+                'class' => 'app\myTemplates\modelCest\Generator', // 生成器类
+                'templates' => [ //配置模版文件
+                    'my' => '@app/myTemplates/modelCest/default', // 模版名称 => 模版路径
+                ]
+            ],
+        ],
     ];
 
 //}

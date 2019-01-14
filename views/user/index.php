@@ -87,7 +87,6 @@ AppAsset::register($this);
 
     </style>
 </head>
-<body>
 <?php $this->beginBody() ?>
 <div id="app">
     <div class="login">
@@ -213,7 +212,7 @@ AppAsset::register($this);
                 this.$notify({
                     title: '登入成功',
                     message: '后台正在开发中~敬请期待~',
-                    type: 'success'
+                    type: 'success',
                 });
             },
 
@@ -237,7 +236,7 @@ AppAsset::register($this);
             submitForm(formName) {
                 // let formData = this.loginForm;
                 //formData = JSON.stringify(formData);
-                let loginUrl = '<?php echo \yii\helpers\Url::toRoute('login/login');?>';
+                let loginUrl = '<?php echo \yii\helpers\Url::toRoute('user/login');?>';
                 const postdata = {
                     username: this.loginForm.username,
                     password: this.loginForm.password,
@@ -258,7 +257,9 @@ AppAsset::register($this);
                                      // this.$router.push({path:'site/index'});
                                      // window.location.href = 'http://binzhizhu.top';
                                     let link = '<?php echo \yii\helpers\Url::to(['site/index'])?>';
-                                    window.location.href = link;
+                                    setTimeout(function () {
+                                        window.location.href = link;
+                                    },2000)
                                 }else if (response.data.code= -101){
                                     this.alertMessage('密码错误',true,'error');
                                 }
@@ -283,6 +284,5 @@ AppAsset::register($this);
 </script>
 
 <?php $this->endBody() ?>
-</body>
 </html>
 <?php $this->endPage() ?>

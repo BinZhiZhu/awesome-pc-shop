@@ -30,7 +30,6 @@ class ElementUI extends AssetBundle
     //     'https://cdn.staticfile.org/element-ui/2.4.11/index.js',
     // ];
 
-
     public $depends = [
         VueJs::class,
         JqueryAsset::class,
