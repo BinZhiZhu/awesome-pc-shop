@@ -53,7 +53,7 @@ class Generator extends \yii\gii\Generator
      */
     public function getName()
     {
-        return 'ModelCest Generator';
+        return 'CURD Cest Generator';
     }
 
     /**
@@ -61,7 +61,7 @@ class Generator extends \yii\gii\Generator
      */
     public function getDescription()
     {
-        return 'This ModelCest generator generates numerous model test code,
+        return 'This CURD Cest generator generates numerous model test code,
         ensure the success rate of database migration';
     }
 

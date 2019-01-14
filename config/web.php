@@ -84,7 +84,7 @@ $config = [
 //                    'my' => '@app/myTemplates/crud/default', // 模版名称 => 模版路径
 //                ]
 //            ],
-            'modelCest' => [ // 生成器名称
+            'curdCest' => [ // 生成器名称
                 'class' => 'app\myTemplates\modelCest\Generator', // 生成器类
                 'templates' => [ //配置模版文件
                     'my' => '@app/myTemplates/modelCest/default', // 模版名称 => 模版路径

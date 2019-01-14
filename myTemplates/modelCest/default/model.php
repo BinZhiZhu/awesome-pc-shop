@@ -102,7 +102,7 @@ foreach ($labels as $column =>$label):?>
         $primaryKey = $model->primaryKey;
         $modelRecord = $model::findOne($primaryKey);
         $I->assertNotEmpty($modelRecord);
-        $I->assertEquals($model::class, get_class($modelRecord));
+        $I->assertEquals($model::className(), get_class($modelRecord));
         <?="\n"?>
 <?php
 foreach ($labels as $column =>$label):?>
