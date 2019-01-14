@@ -41,7 +41,7 @@ class <?= $className ?>Cest
     */
     public function tryToTest<?= $className?>Curd(FunctionalTester $I)
     {
-
+        //创建一个测试模型实例
         $model = new \app\models\<?=$className?>;
         <?="\n"?>
         <?php
@@ -49,14 +49,35 @@ class <?= $className ?>Cest
         $modelColumns = [];
         foreach ($labels as $column =>$label):?>
 $I->assertEmpty($model-><?=$column?>, "<?=$column?> 初始值为null");
+            <?="\n"?>
         <?php endforeach; ?>
 <?php
         foreach ($labels as $column =>$label):?>
 $<?=$column?> = \app\common\Helper::random(9, true);
+<?php
+if($column === 'id'){
+echo '
+    //todo 判断随机生成的主键是否已经存在
+';
+}
+?>
         $model-><?=$column?> =$<?=$column?>;
         $I->assertEquals($model-><?=$column?>,$<?=$column?>);
             <?="\n"?>
         <?php endforeach; ?>
+//insert
+        $model->save();
+        <?="\n"?>
+        $I->assertNotEmpty($model->id)
+        <?="\n"?>
+<?php
+foreach ($labels as $column =>$label):?>
+        $I->assertEquals($model-><?=$column?>,$<?=$column?>);
+    <?="\n"?>
+<?php endforeach; ?>
+        <?="\n"?>
+        $I->assertTrue($model->refresh());
+
 }
 
 <?php if ($generator->db !== 'db'): ?>
