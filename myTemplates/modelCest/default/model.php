@@ -56,16 +56,16 @@ $I->assertEmpty($model-><?=$column?>, "<?=$column?> 初始值为null");
 $<?=$column?> = \app\common\Helper::random(9, true);
 <?php
 if($column === 'id'){
-echo '
-    //todo 判断随机生成的主键是否已经存在
-';
+echo "
+        //todo 判断随机生成的主键是否已经存在
+";
 }
 ?>
         $model-><?=$column?> =$<?=$column?>;
         $I->assertEquals($model-><?=$column?>,$<?=$column?>);
             <?="\n"?>
         <?php endforeach; ?>
-//insert
+//ensure Create
         $model->save();
         <?="\n"?>
         $I->assertNotEmpty($model->id)
@@ -77,7 +77,42 @@ foreach ($labels as $column =>$label):?>
 <?php endforeach; ?>
         <?="\n"?>
         $I->assertTrue($model->refresh());
+        <?="\n"?>
+        // ensure Update
+<?php
+foreach ($labels as $column =>$label):?>
+        $<?=$column?> = \app\common\Helper::random(9, true);
+        $model-><?=$column?> =$<?=$column?>;
+        $I->assertEquals($model-><?=$column?>,$<?=$column?>);
+        <?="\n"?>
+<?php endforeach; ?>
+        <?="\n"?>
+        $model->save();
+        <?="\n"?>
+<?php
+foreach ($labels as $column =>$label):?>
+        $I->assertEquals($model-><?=$column?>,$<?=$column?>);
+    <?="\n"?>
+<?php endforeach; ?>
+        <?="\n"?>
+        $I->assertTrue($model->refresh());
+        <?="\n"?>
 
+        // ensure Retrieve
+        $primaryKey = $model->primaryKey;
+        $modelRecord = $model::findOne($primaryKey);
+        $I->assertNotEmpty($modelRecord);
+        $I->assertEquals($model::class, get_class($modelRecord));
+        <?="\n"?>
+<?php
+foreach ($labels as $column =>$label):?>
+        $I->assertEquals($model-><?=$column?>,$<?=$column?>);
+    <?="\n"?>
+<?php endforeach; ?>
+        <?="\n"?>
+        //ensure del
+        $model->delete();
+        $I->assertFalse($model->refresh());
 }
 
 <?php if ($generator->db !== 'db'): ?>
