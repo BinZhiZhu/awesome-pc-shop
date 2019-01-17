@@ -1,8 +1,12 @@
 <?php
 
-namespace modules\api\components;
+namespace common\modules\api\components;
 
-use modules\api\Module;
+use common\components\AppUser;
+use common\components\Request;
+use common\helpers\JWT;
+use common\models\ShopMember;
+use common\modules\api\Module;
 use Exception;
 use JsonRPC\Server;
 use Yii;
@@ -101,11 +105,25 @@ class JsonRpcServer extends Server
 
         // 如果header中有JWT，则直接检测
         $jwt = Request::getInstance()->headers->get('JWT');
+        Yii::debug('如果header中有JWT' . $jwt);
         if ($jwt) {
             $userData = false;
             try {
-                $userData = AppUser::getInstance()->verifyToken($jwt);
-            } catch (Exception $e) {
+//                $userData = AppUser::getInstance()->verifyToken($jwt);
+                $userData = JWT::decode($jwt);
+                Yii::debug('接口验证jwt后：' . json_encode($userData));
+            }
+            catch (\Psecio\Jwt\Exception\ExpiredException $ex)
+            {
+                $openid = Request::getInstance()->headers->get('openid');
+                if ($openid) {
+                    $member = ShopMember::getModel($openid);
+                    if ($member) {
+                        AppUser::getInstance()->login($member);
+                    }
+                }
+            }
+            catch (Exception $e) {
                 Yii::warning("解析JWT【{$jwt}】时发生错误：".(string)$e, __METHOD__);
             }
             $id = ArrayHelper::getValue($userData, 'id');
@@ -115,15 +133,16 @@ class JsonRpcServer extends Server
                     AppUser::getInstance()->login($member);
                 }
             }
-        }
 
-        // 不安全的校验，在旧版本里面，很多时候用户身份验证是靠openid的，这种方式十分不安全。
-        // 我们计划在前后端分离完成后，正式废弃这种方法
-        $openid = Request::getInstance()->headers->get('openid');
-        if ($openid) {
-            $member = ShopMember::getModel($openid);
-            if ($member) {
-                AppUser::getInstance()->login($member);
+        }else{
+            // 不安全的校验，在旧版本里面，很多时候用户身份验证是靠openid的，这种方式十分不安全。
+            // 我们计划在前后端分离完成后，正式废弃这种方法
+            $openid = Request::getInstance()->headers->get('openid');
+            if ($openid) {
+                $member = ShopMember::getModel($openid);
+                if ($member) {
+                    AppUser::getInstance()->login($member);
+                }
             }
         }
     }

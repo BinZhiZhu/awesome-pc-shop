@@ -1,9 +1,11 @@
 <?php
 
-namespace modules\api\controllers;
+namespace common\modules\api\controllers;
 
-use modules\api\components\JsonRpcProcedureHandler;
-use modules\api\components\JsonRpcServer;
+use common\components\Request;
+use common\components\Response;
+use common\modules\api\components\JsonRpcProcedureHandler;
+use common\modules\api\components\JsonRpcServer;
 use Yii;
 use yii\web\Controller;
 

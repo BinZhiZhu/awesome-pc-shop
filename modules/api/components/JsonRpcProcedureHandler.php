@@ -1,6 +1,6 @@
 <?php
 
-namespace modules\api\components;
+namespace common\modules\api\components;
 
 use Anodoc\Parser;
 use Anodoc\Tags\Tag;

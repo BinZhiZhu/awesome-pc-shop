@@ -1,9 +1,8 @@
 <?php
 
-namespace modules\api;
+namespace common\modules\api;
 
-use modules\api\components\JsonRpcServer;
-
+use common\modules\api\components\JsonRpcServer;
 use Exception;
 
 class Module extends \yii\base\Module
