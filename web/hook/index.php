@@ -1,5 +1,5 @@
 <?php
-// todo 验证、日志，请自己解析push内容并操作
+// todo 验证、日志解析push内容并操作
 
 // 获取push数据内容的方法
 $requestBody = file_get_contents("php://input");
