@@ -14,6 +14,8 @@ $config = [
         '@npm'   => '@vendor/npm-asset',
         '@casbin' => '@vendor/casbin',
         '@bin' => dirname(__DIR__),
+        '@casbin' => '@vendor/casbin',
+        '@adapter'=> '@vendor/yii-adapter'
     ],
     'modules' => [
         'api' => [
@@ -27,7 +29,7 @@ $config = [
             'cookieValidationKey' => '33VvOVnAPHPR6oqvzlbpa4J_ryENWIBJ',
         ],
         'casbin' => [
-            'class' => '@vendor\casbin',
+            'class' => '@casbin',
             /*
              * Yii-casbin model setting.
              */
@@ -39,7 +41,7 @@ $config = [
             ],
 
             // Yii-casbin adapter .
-            'adapter' => '@vendor\yii-adapter',
+            'adapter' => '@adapter',
 
             /*
              * Yii-casbin database setting.
