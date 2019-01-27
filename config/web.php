@@ -23,7 +23,31 @@ $config = [
             'enableCsrfValidation'=>false, //取消enableCookieValidation的验证  隐藏表单的_csrf
             'cookieValidationKey' => '33VvOVnAPHPR6oqvzlbpa4J_ryENWIBJ',
         ],
+        'casbin' => [
+            'class' => '\CasbinAdapter\Yii\Casbin',
+            /*
+             * Yii-casbin model setting.
+             */
+            'model' => [
+                // Available Settings: "file", "text"
+                'config_type' => 'file',
+                'config_file_path' => '@vendor/casbin-model.conf',
+                'config_text' => '',
+            ],
 
+            // Yii-casbin adapter .
+            'adapter' => '\CasbinAdapter\Yii\Adapter',
+
+            /*
+             * Yii-casbin database setting.
+             */
+            'database' => [
+                // Database connection for following tables.
+                'connection' => '',
+                // CasbinRule tables and model.
+                'casbin_rules_table' => '{{%casbin_rule}}',
+            ],
+        ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
