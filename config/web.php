@@ -9,8 +9,11 @@ $config = [
     'bootstrap' => ['log'],
     'language'=>'zh-CN',
     'aliases' => [
+        '@root' => realpath(__DIR__ . '/../'),
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
+        '@casbin' => '@vendor/casbin',
+        '@bin' => dirname(__DIR__),
     ],
     'modules' => [
         'api' => [
@@ -24,19 +27,19 @@ $config = [
             'cookieValidationKey' => '33VvOVnAPHPR6oqvzlbpa4J_ryENWIBJ',
         ],
         'casbin' => [
-            'class' => '\CasbinAdapter\Yii\Casbin',
+            'class' => '@vendor\casbin',
             /*
              * Yii-casbin model setting.
              */
             'model' => [
                 // Available Settings: "file", "text"
                 'config_type' => 'file',
-                'config_file_path' => '@vendor/casbin-model.conf',
-                'config_text' => '',
+                'config_file_path' => __DIR__.'/casbin/model.conf',
+                'config_text' => __DIR__ .'/casbin/policy.csv',
             ],
 
             // Yii-casbin adapter .
-            'adapter' => '\CasbinAdapter\Yii\Adapter',
+            'adapter' => '@vendor\yii-adapter',
 
             /*
              * Yii-casbin database setting.
