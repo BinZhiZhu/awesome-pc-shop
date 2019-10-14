@@ -235,6 +235,31 @@ AppAsset::register($this);
                                 <el-button @click="resetForm('form')">重置</el-button>
                         </span>
                         </el-dialog>
+                        <el-dialog
+                                title="用户登录"
+                                :visible.sync="dialogLoginVisible"
+                                width="30%"
+                                center
+                                :before-close="handleClose"
+                        >
+                            <el-form :model="form" :rules="registerRules" ref="form">
+                                <el-form-item label="账号" :label-width="formLabelWidth" prop="username">
+                                    <el-input v-model="form.username" autocomplete="off"></el-input>
+                                </el-form-item>
+                                <el-form-item label="密码" :label-width="formLabelWidth" prop="password">
+                                    <el-input type="password" v-model="form.password" autocomplete="off"></el-input>
+                                </el-form-item>
+                                <el-form-item label="确认密码" :label-width="formLabelWidth" prop="checkPass">
+                                    <el-input type="password" v-model="form.checkPass"></el-input>
+                                </el-form-item>
+                            </el-form>
+                            <span slot="footer" class="dialog-footer">
+                          <el-tooltip class="item" effect="dark" :content="loginTip" placement="bottom">
+                                    <el-button type="primary" @click="submitLoginForm('form')">登录</el-button>
+                                </el-tooltip>
+                                <el-button @click="resetForm('form')">重置</el-button>
+                        </span>
+                        </el-dialog>
                     </div>
                 </div>
             </el-col>
@@ -353,6 +378,7 @@ AppAsset::register($this);
                 return {
                     dialogVisible: false,
                     dialogRegisterVisible: false,
+                    dialogLoginVisible: false,
                     input2: '',
                     formLabelWidth: '120px',
                     form: {
@@ -407,13 +433,16 @@ AppAsset::register($this);
                         type: 'success',
                     });
                 },
+                loginSuccess() {
+                    this.$notify({
+                        title: '登录成功',
+                        message: '快选择自己喜欢的花卉吧',
+                        type: 'success',
+                    });
+                },
                 handleClose(done) {
-                    this.$confirm('确认关闭？')
-                        .then(_ => {
-                            done();
-                        })
-                        .catch(_ => {
-                        });
+                    this.dialogRegisterVisible = false
+                    this.dialogLoginVisible = false
                 },
                 alertMessage(msg, close, type) {
                     this.$message({
@@ -429,6 +458,7 @@ AppAsset::register($this);
                 },
                 //登录用户
                 loginUser() {
+                    this.dialogLoginVisible = true
                 },
                 //提交表单
                 submitForm(formName) {
@@ -450,9 +480,46 @@ AppAsset::register($this);
                                     console.log('success', response);
                                     if (response.data.code === 100) {
                                         this.registerSuccess();
+                                        this.dialogRegisterVisible = false
                                         // TODO 引导用户登录咯
 
                                     } else if (response.data.code === -100) {
+                                        this.alertMessage(response.data.message, true, 'error');
+                                    }
+                                })
+                                .catch(error => {
+                                    console.log(error)
+                                });
+                        } else {
+                            console.log('res', valid)
+                            console.log('--data--', postdata)
+
+                            return false;
+                        }
+                    });
+                },
+                //提交表单
+                submitLoginForm(formName) {
+                    let loginUrl = '<?php echo \yii\helpers\Url::toRoute('pc/login');?>';
+                    const postdata = {
+                        username: this.form.username,
+                        password: this.form.password,
+                    };
+                    this.$refs[formName].validate((valid) => {
+                        if (valid) {
+                            console.log('res', valid)
+                            console.log('--登录接口--')
+                            let param = new URLSearchParams();
+                            param.append('username', postdata.username);
+                            param.append('password', postdata.password);
+                            console.warn('登录提交过去的参数', postdata)
+                            axios.post(loginUrl, param)
+                                .then(response => {
+                                    console.log('success', response);
+                                    if (response.data.code === 100) {
+                                        this.loginSuccess();
+                                        this.dialogLoginVisible = false
+                                    } else if (response.data.code === -101) {
                                         this.alertMessage(response.data.message, true, 'error');
                                     }
                                 })
