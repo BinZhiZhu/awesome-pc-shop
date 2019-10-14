@@ -20,7 +20,7 @@ AppAsset::register($this);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?php $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
-    <link rel="shortcut icon" href="<?=$host  ?>/favicon.ico" type="image/x-icon"/>
+<!--    <link rel="shortcut icon" href="--><?//=$host  ?><!--/favicon.ico" type="image/x-icon"/>-->
     <?php $this->head() ?>
     <style>
         * {
@@ -38,7 +38,7 @@ AppAsset::register($this);
         }
 
         .login {
-            background-image: url("<?php $host ?> /images/bg.png");
+            background-image: url("http://www.zydscjzx.cn/manage/images/login-1.jpg");
             width: 100%;
             background-position: 50%;
             background-size: cover; /*铺满*/
@@ -93,8 +93,8 @@ AppAsset::register($this);
         <div class="login-box">
             <template>
                 <div class="user-login-header">
-                    <h2>Element-ui-Admin</h2>
-                    <p>基于Vue+Element-ui实现的后台管理系统</p>
+                    <h2>商家后台管理系统</h2>
+                    <p>这里是后台管理系统这里是后台管理系统</p>
                 </div>
             </template>
             <template>
@@ -256,11 +256,11 @@ AppAsset::register($this);
                                     this.loginSuccess();
                                      // this.$router.push({path:'site/index'});
                                      // window.location.href = 'http://binzhizhu.top';
-                                    let link = '<?php echo \yii\helpers\Url::to(['site/index'])?>';
+                                    let link = '<?php echo \yii\helpers\Url::to(['admin/index'])?>';
                                     setTimeout(function () {
                                         window.location.href = link;
                                     },2000)
-                                }else if (response.data.code= -101){
+                                }else if (response.data.code === -101){
                                     this.alertMessage('密码错误',true,'error');
                                 }
                             })

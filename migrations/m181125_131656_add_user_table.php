@@ -17,7 +17,7 @@ class m181125_131656_add_user_table extends Migration
             $this->createTable('dev_users', [
                 'id' => $this->primaryKey(11),
                 'username' => $this->string(50)->notNull()->defaultValue('')->comment('用户姓名'),
-                'password' => $this->string(20)->notNull()->defaultValue('')->comment('用户密码'),
+                'password' => $this->string(255)->notNull()->defaultValue('')->comment('用户密码'),
                 'salt' => $this->string(20)->notNull()->defaultValue('')->comment('加密盐'),
                 'status' => $this->integer(11)->notNull()->defaultValue(0)->comment('状态'),
                 'register_ip' => $this->string(20)->notNull()->defaultValue('')->comment('注册ip'),

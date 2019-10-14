@@ -14,7 +14,6 @@ $config = [
         '@npm'   => '@vendor/npm-asset',
         '@casbin' => '@vendor/casbin',
         '@bin' => dirname(__DIR__),
-        '@casbin' => '@vendor/casbin',
         '@adapter'=> '@vendor/yii-adapter'
     ],
     'modules' => [
@@ -28,31 +27,6 @@ $config = [
             'enableCsrfValidation'=>false, //取消enableCookieValidation的验证  隐藏表单的_csrf
             'cookieValidationKey' => '33VvOVnAPHPR6oqvzlbpa4J_ryENWIBJ',
         ],
-        'casbin' => [
-            'class' => '@casbin',
-            /*
-             * Yii-casbin model setting.
-             */
-            'model' => [
-                // Available Settings: "file", "text"
-                'config_type' => 'file',
-                'config_file_path' => __DIR__.'/casbin/model.conf',
-                'config_text' => __DIR__ .'/casbin/policy.csv',
-            ],
-
-            // Yii-casbin adapter .
-            'adapter' => '@adapter',
-
-            /*
-             * Yii-casbin database setting.
-             */
-            'database' => [
-                // Database connection for following tables.
-                'connection' => '',
-                // CasbinRule tables and model.
-                'casbin_rules_table' => '{{%casbin_rule}}',
-            ],
-        ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
@@ -60,7 +34,12 @@ $config = [
             'identityClass' => 'app\models\User',
             'enableAutoLogin' => true,
         ],
-        'errorHandler' => [
+        'session' => [
+            'class' =>'yii\web\session',
+            'timeout' => 60 * 60 * 24 * 30,
+            'cookieParams' => ['lifetime' => 30 * 24 * 60 * 60]
+        ],
+            'errorHandler' => [
         //    'errorAction' => 'site/error',
         ],
         'mailer' => [
@@ -90,8 +69,8 @@ $config = [
         */
     ],
     'params' => $params,
-    'defaultRoute' => 'user',
-//     'layout' =>false,
+    'defaultRoute' => 'pc',
+     'layout' =>false,
 ];
 
 //if (YII_ENV_DEV) {
@@ -99,7 +78,8 @@ $config = [
     $config['bootstrap'][] = 'debug';
     $config['modules']['debug'] = [
         'class' => 'yii\debug\Module',
-        // uncomment the following to add your IP if you are not connecting from localhost.
+        'historySize'=>'5000',
+        'traceLine' => '<a href="phpstorm://open?url={file}&line={line}">{file}:{line}</a>',
         'allowedIPs' => ['127.0.0.1', '::1', '*'],
     ];
 
@@ -115,12 +95,6 @@ $config = [
 //                    'my' => '@app/myTemplates/crud/default', // 模版名称 => 模版路径
 //                ]
 //            ],
-            'curdCest' => [ // 生成器名称
-                'class' => 'app\myTemplates\modelCest\Generator', // 生成器类
-                'templates' => [ //配置模版文件
-                    'my' => '@app/myTemplates/modelCest/default', // 模版名称 => 模版路径
-                ]
-            ],
         ],
     ];
 

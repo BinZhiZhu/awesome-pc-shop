@@ -36,7 +36,7 @@ class DevUsers extends \yii\db\ActiveRecord
     {
         return [
             [['status', 'lastvisit_time', 'register_time', 'login_count'], 'integer'],
-            [['username'], 'string', 'max' => 50],
+            [['username'], 'string', 'max' => 255],
             [['password', 'salt', 'register_ip', 'lastvisit_ip'], 'string', 'max' => 20],
             [['hash_pwd'], 'string'],
         ];
@@ -60,5 +60,34 @@ class DevUsers extends \yii\db\ActiveRecord
             'login_count' => 'Login Count',
             'hash_pwd0' => 'Hash Pwd'
         ];
+    }
+
+    /**
+     * 登录认证
+     *
+     * @return bool
+     */
+    public static function checkLogin()
+    {
+        $session = Yii::$app->session;
+        Yii::info('session---'.$session->get('is_user_id')['value']);
+        if ($session->get('is_user_id')) {
+            return true;
+        } else {
+            $userId = $session->get('is_user_id');
+//            $userToken = $session->get('is_user_token');
+            if (empty($userid)) {
+                return false;
+            } else {
+//                $sql['token'] = $userToken;
+                $user = self::findOne($userId);
+                if (!empty($user)) {
+                    $session['is_user_id'] = ['value'=>$user['id'],'expire_time'=>time()+3600*2];
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
     }
 }
