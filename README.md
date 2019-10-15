@@ -1,16 +1,24 @@
-## 基于vue+Element-ui的后台管理系统
+## 基于vue+Element-ui+PHP 的后台管理系统
 
-- 前端技术栈：vue、jQuery
+- 前端技术栈：vue
 - 后台组件库：Element-ui
 - http库：axios (类ajax)
-- 后端开发语言：PHP 7.1
+- 后端开发语言：PHP
 - 后端开发框架：Yii2
+- 数据库服务：Mysql
 
-项目进度：
-系统登录界面：true
-系统登录后台接口：true
-系统后台管理界面：ing ...
+### 部署
+
+1.cd 到该项目文件夹，命令行运行：composer install,如果环境没有安装composer，请先安装composer  
+2.本地建立数据库，数据库名称：demo，账号：root，密码：123456。
+3.命令行运行 ./yii migrate 进行数据库迁移，也就是给数据库建表
+4. 运行项目命令：./yii serve 
 
 
-项目初期，一边学习一边开发，努力，学习~~~
+### FAQ
+
+如果部署遇到问题，请联系BinZhiZhu
+
+
+
 
