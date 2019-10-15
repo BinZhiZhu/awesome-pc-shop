@@ -37,9 +37,11 @@ class UserController extends Controller
 
         $username = Yii::$app->request->post('username');
         $password = Yii::$app->request->post('password');
+        $role = Yii::$app->request->post('role');
 
         $username = trim($username);
         $password = trim($password);
+        $role = intval($role);
 
         $hash_password = Yii::$app->security->generatePasswordHash($password);//加密
 
@@ -50,11 +52,23 @@ class UserController extends Controller
 
         $user = DevUsers::findOne([
             'username' => $username,
+            'role' => $role
         ]);
 
-        if ($user) {
+        if (!$user) {
+            Yii::debug("用户不存在",__METHOD__);
+            return Yii::createObject([
+                'class' => 'yii\web\Response',
+                'format' => \yii\web\Response::FORMAT_JSON,
+                'data' => [
+                    'message' => '账号不存在，请先注册',
+                    'code' => -102,
+                ]
+            ]);
+        }else{
+            Yii::debug("用户存在:".var_export($user->toArray(),true),__METHOD__);
             //有该用户且通过密码校验
-            if ($user['password'] === md5($password) && $justifyPwd) {
+            if ($user && $user['password'] === md5($password) && $justifyPwd) {
                 DevUsers::updateAll(
                     [
                         'lastvisit_ip' => Yii::$app->request->getUserIP(),
@@ -62,22 +76,25 @@ class UserController extends Controller
                         'login_count' => $user->login_count + 1,//登录次数+1
                     ], [
                     'username' => $username,
-                    'id' => intval($user['id'])
+                    'id' => intval($user['id']),
+                    'role' => $role
                 ]);
 
+                // 登录成功后操作
                 $session['is_user_id'] = [
                     'value' => $user['id'],
                     'expire_time' => time() + 60
                 ];
+
                 return Yii::createObject([
                     'class' => 'yii\web\Response',
                     'format' => \yii\web\Response::FORMAT_JSON,
                     'data' => [
-                        'message' => '登录成功',
+                        'message' => '登录成功，欢迎回来~',
                         'code' => 100,
                     ]
                 ]);
-            } else {
+            } else if($user && $user['password'] !== md5($password)) {
                 //有该用户但是密码没有通过验证
                 return Yii::createObject([
                     'class' => 'yii\web\Response',
@@ -91,8 +108,41 @@ class UserController extends Controller
 
         }
 
+    }
 
-        //认为是第一次登录
+
+    /**
+     * 注册用户
+     *
+     * @return object
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function actionRegister()
+    {
+        $username = Yii::$app->request->post('username');
+        $password = Yii::$app->request->post('password');
+        $role = Yii::$app->request->post('role');
+
+        $username = trim($username);
+        $password = trim($password);
+        $role = intval($role);
+
+        $user = DevUsers::findOne([
+            'username' => $username,
+            'role' => $role
+        ]);
+
+        if ($user) {
+            return Yii::createObject([
+                'class' => 'yii\web\Response',
+                'format' => \yii\web\Response::FORMAT_JSON,
+                'data' => [
+                    'message' => '改账号已注册，请重新填写',
+                    'code' => -100,
+                ]
+            ]);
+        }
+
         $user_data = [
             'username' => $username,
             'password' => md5($password),
@@ -102,6 +152,7 @@ class UserController extends Controller
             'register_time' => time(),
             'lastvisit_time' => time(),
             'lastvisit_ip' => Yii::$app->request->getUserIP(),
+            'role' => $role
         ];
 
 
@@ -109,23 +160,16 @@ class UserController extends Controller
         $user->attributes = $user_data;
         $user->save(false);
 
-        // 登录成功后操作
-
-        $session['is_user_id'] = [
-            'value' => $user['id'],
-            'expire_time' => time() + 60
-        ];
 
         return Yii::createObject([
             'class' => 'yii\web\Response',
             'format' => \yii\web\Response::FORMAT_JSON,
             'data' => [
-                'message' => '登录成功',
+                'message' => '注册成功，马上登录后台吧',
                 'code' => 100,
             ]
         ]);
     }
-
 
     /**
      * 产生随机令牌

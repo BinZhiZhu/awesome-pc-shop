@@ -20,7 +20,7 @@ AppAsset::register($this);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?php $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
-<!--    <link rel="shortcut icon" href="--><?//=$host  ?><!--/favicon.ico" type="image/x-icon"/>-->
+    <!--    <link rel="shortcut icon" href="--><? //=$host  ?><!--/favicon.ico" type="image/x-icon"/>-->
     <?php $this->head() ?>
     <style>
         * {
@@ -32,6 +32,7 @@ AppAsset::register($this);
             height: 100%;
             width: 100%;
         }
+
         body {
             background-color: #f2f2f2;
             overflow-y: hidden;
@@ -62,6 +63,7 @@ AppAsset::register($this);
             right: 20px;
             top: 20px;
         }
+
         .user-login-header {
             position: relative;
             right: -30px;
@@ -103,6 +105,16 @@ AppAsset::register($this);
                         <el-form-item label="账号" prop="username">
                             <el-input type="text" v-model="loginForm.username" autocomplete="off"></el-input>
                         </el-form-item>
+                        <el-form-item label="角色" prop="role">
+                        <el-select v-model="loginForm.role" placeholder="请选择">
+                            <el-option
+                                    v-for="item in options"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value">
+                            </el-option>
+                        </el-select>
+                        </el-form-item>
                         <el-form-item label="密码" prop="password">
                             <el-input type="password" v-model="loginForm.password" autocomplete="off"></el-input>
                         </el-form-item>
@@ -112,16 +124,19 @@ AppAsset::register($this);
                         <div class="login-btn">
                             <el-form-item>
                                 <el-tooltip class="item" effect="dark" :content="loginTip" placement="bottom">
-                                    <el-button type="primary" @click="submitForm('loginForm')">登录</el-button>
+                                    <el-button type="primary" @click="submitForm('loginForm',0)">登录</el-button>
                                 </el-tooltip>
-                                <el-button @click="resetForm('loginForm')">重置</el-button>
+<!--                                <el-button @click="resetForm('loginForm')">重置</el-button>-->
+                                <el-tooltip class="item" effect="dark" :content="registerTip" placement="bottom">
+                                    <el-button type="primary" @click="submitForm('loginForm',1)">注册</el-button>
+                                </el-tooltip>
                             </el-form-item>
                         </div>
                     </el-form>
                 </div>
             </template>
         </div>
-        <div class="dev-process" >
+        <div class="dev-process">
             <template>
                 <el-tooltip class="item" effect="light" :content="tooltip" placement="top-start" width="150px">
                     <el-progress type="circle" :percentage="percentage" stroke-width="8"></el-progress>
@@ -135,7 +150,7 @@ AppAsset::register($this);
     axios.defaults.baseURL = "";
     const router = new VueRouter({
         routes: [
-            {path : '/site',  name: 'indexPage'},
+            {path: '/site', name: 'indexPage'},
         ]
     });
 
@@ -155,7 +170,7 @@ AppAsset::register($this);
                     callback();
                 }
             };
-            var validatePassword= (rule, value, callback) => {
+            var validatePassword = (rule, value, callback) => {
                 if (value === '') {
                     callback(new Error('请输入密码'));
                 } else {
@@ -178,9 +193,21 @@ AppAsset::register($this);
                 loginForm: {
                     username: '',
                     password: '',
-                    checkPass: ''
+                    checkPass: '',
+                    role: null
                 },
-                loginTip: '为了方便演示，用户名与账号可随意登录',
+                options: [
+                    {
+                        value: 0,
+                        label: '商家'
+                    },
+                    {
+                        value: 1,
+                        label: '管理员'
+                    }
+                ],
+                loginTip: '请填写账号密码，登录',
+                registerTip: '请点击进行注册',
                 tooltip: '当前开发进度为5%',
                 percentage: '5',
                 //校验规则
@@ -211,12 +238,12 @@ AppAsset::register($this);
             loginSuccess() {
                 this.$notify({
                     title: '登入成功',
-                    message: '后台正在开发中~敬请期待~',
+                    message: '欢迎回来哦~',
                     type: 'success',
                 });
             },
 
-            alertMessage(msg,close,type) {
+            alertMessage(msg, close, type) {
                 this.$message({
                     showClose: close,
                     message: msg,
@@ -233,35 +260,53 @@ AppAsset::register($this);
                 })
             },
             //提交表单
-            submitForm(formName) {
+            submitForm(formName,type) {
                 // let formData = this.loginForm;
                 //formData = JSON.stringify(formData);
                 let loginUrl = '<?php echo \yii\helpers\Url::toRoute('user/login');?>';
+                let registerUrl = '<?php echo \yii\helpers\Url::toRoute('user/register');?>';
+
+                if(this.loginForm.role === null){
+                    this.alertMessage('请选择角色', true, 'error');
+                }
                 const postdata = {
                     username: this.loginForm.username,
                     password: this.loginForm.password,
+                    role: this.loginForm.role,
                 };
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         console.log('res', valid)
-                        //todo  接口
-                        console.log('--登录接口--')
                         let param = new URLSearchParams();
                         param.append('username', postdata.username);
                         param.append('password', postdata.password);
-                        axios.post(loginUrl, param)
+                        param.append('role', postdata.role);
+                        console.log('--登录接口--',postdata)
+                        // type: 0 是登录场景 1 注册场景
+                        var apiName = type === 0 ? loginUrl : registerUrl;
+                        console.warn('请求接口',apiName)
+                        axios.post(apiName, param)
                             .then(response => {
                                 console.log('success', response);
-                                if(response.data.code === 100){
-                                    this.loginSuccess();
-                                     // this.$router.push({path:'site/index'});
-                                     // window.location.href = 'http://binzhizhu.top';
-                                    let link = '<?php echo \yii\helpers\Url::to(['admin/index'])?>';
-                                    setTimeout(function () {
-                                        window.location.href = link;
-                                    },2000)
-                                }else if (response.data.code === -101){
-                                    this.alertMessage('密码错误',true,'error');
+                                if (response.data.code === 100) {
+                                    switch (type) {
+                                        case 0:
+                                            this.loginSuccess();
+                                            // this.$router.push({path:'site/index'});
+                                            // window.location.href = 'http://binzhizhu.top';
+                                            let link = '<?php echo \yii\helpers\Url::to(['admin/index'])?>';
+                                            setTimeout(function () {
+                                                window.location.href = link;
+                                            }, 2000)
+                                            break;
+                                        case 1:
+                                            //TODO 成功引导登录吧
+                                            this.resetForm('loginForm')
+                                            this.alertMessage(response.data.message, true, 'success');
+                                            break;
+                                    }
+                                } else if (response.data.code !== 100) {
+                                    this.alertMessage(response.data.message, true, 'error');
                                 }
                             })
                             .catch(error => {
@@ -269,7 +314,7 @@ AppAsset::register($this);
                             });
                     } else {
                         console.log('res', valid)
-                        console.log('--data--',postdata)
+                        console.log('--data--', postdata)
 
                         return false;
                     }

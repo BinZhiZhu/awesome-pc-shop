@@ -18,6 +18,7 @@ use Yii;
  * @property int $register_time 注册时间
  * @property int $login_count 登录次数
  * @property int $hash_pwd 加密密码
+ * @property int $role 角色
  */
 class DevUsers extends \yii\db\ActiveRecord
 {
@@ -35,7 +36,7 @@ class DevUsers extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['status', 'lastvisit_time', 'register_time', 'login_count'], 'integer'],
+            [['status', 'lastvisit_time', 'register_time', 'login_count','role'], 'integer'],
             [['username'], 'string', 'max' => 255],
             [['password', 'salt', 'register_ip', 'lastvisit_ip'], 'string', 'max' => 20],
             [['hash_pwd'], 'string'],
@@ -58,7 +59,8 @@ class DevUsers extends \yii\db\ActiveRecord
             'lastvisit_ip' => 'Lastvisit Ip',
             'register_time' => 'Register Time',
             'login_count' => 'Login Count',
-            'hash_pwd0' => 'Hash Pwd'
+            'hash_pwd0' => 'Hash Pwd',
+            'role'=>'role'
         ];
     }
 
