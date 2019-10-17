@@ -64,15 +64,13 @@ AppAsset::register($this);
                     </dl>
                 </li>
                 <li class="layui-nav-item">
-                    <a href="javascript:;">解决方案</a>
+                    <a href="javascript:;">订单管理</a>
                     <dl class="layui-nav-child">
-                        <dd><a href="javascript:;">列表一</a></dd>
-                        <dd><a href="javascript:;">列表二</a></dd>
-                        <dd><a href="">超链接</a></dd>
+                        <dd><a href="javascript:;">订单列表</a></dd>
                     </dl>
                 </li>
-                <li class="layui-nav-item"><a href="">云市场</a></li>
-                <li class="layui-nav-item"><a href="">发布商品</a></li>
+                <li class="layui-nav-item"><a href="">帮助</a></li>
+                <li class="layui-nav-item"><a href="">关于我们</a></li>
             </ul>
         </div>
     </div>
@@ -86,7 +84,7 @@ AppAsset::register($this);
 
     <div class="layui-footer">
         <!-- 底部固定区域 -->
-        © layui.com - 底部固定区域
+        © 版权归 鲜花网 所有
     </div>
 </div>
 <script src="https://www.layuicdn.com/layui/layui.js"></script>
