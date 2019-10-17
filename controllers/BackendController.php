@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\enums\RoleTypeEnum;
 use app\enums\StatusTypeEnum;
+use app\models\AppUsers;
 use app\models\DevUsers;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -22,7 +23,14 @@ class BackendController extends Controller
     }
 
 
+    public function actionPc()
+    {
+        return $this->render('pc');
+    }
+
+
     /**
+     * 获取后台用户列表
      * @return object
      * @throws \yii\base\InvalidConfigException
      */
@@ -59,6 +67,46 @@ class BackendController extends Controller
         ]);
     }
 
+
+
+    /**
+     * 获取前台用户
+     *
+     * @return object
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function actionGetAppUserList()
+    {
+        $users = AppUsers::find()
+            ->where([
+                'status' => StatusTypeEnum::ON,
+                'is_deleted'=>StatusTypeEnum::OFF
+            ])
+            ->orderBy(['id' => SORT_DESC])
+            ->asArray()
+            ->all();
+
+        foreach ($users as &$user) {
+            $user['register_time'] = date("Y:m:d H:i", $user['register_time']);
+            $user['lastvisit_time'] = date("Y:m:d H:i", $user['lastvisit_time']);
+            $user['host_info'] = Yii::$app->request->getHostInfo();
+        }
+
+        unset($user);
+
+        return Yii::createObject([
+            'class' => 'yii\web\Response',
+            'format' => \yii\web\Response::FORMAT_JSON,
+            'data' => [
+                'code' => 200,
+                'result' => [
+                    'list'=>$users,
+                    'total'=>count($users)
+                ]
+            ]
+        ]);
+    }
+
     /**
      * 删除后台用户
      *
@@ -72,6 +120,49 @@ class BackendController extends Controller
         $id = Yii::$app->request->post('id');
 
         $user = DevUsers::findOne([
+            'id' => intval($id)
+        ]);
+
+        if (!$user) {
+            return Yii::createObject([
+                'class' => 'yii\web\Response',
+                'format' => \yii\web\Response::FORMAT_JSON,
+                'data' => [
+                    'code' => -200,
+                    'message' => '用户不存在',
+                    'result' => []
+                ]
+            ]);
+        }
+
+        $user->is_deleted = StatusTypeEnum::ON;
+        $user->save(false);
+
+        return Yii::createObject([
+            'class' => 'yii\web\Response',
+            'format' => \yii\web\Response::FORMAT_JSON,
+            'data' => [
+                'code' => 200,
+                'message' => '删除成功',
+                'result' => []
+            ]
+        ]);
+    }
+
+
+    /**
+     * 删除后台用户
+     *
+     * @return object
+     * @throws \Throwable
+     * @throws \yii\base\InvalidConfigException
+     * @throws \yii\db\StaleObjectException
+     */
+    public function actionDeleteAppUser()
+    {
+        $id = Yii::$app->request->post('id');
+
+        $user = AppUsers::findOne([
             'id' => intval($id)
         ]);
 

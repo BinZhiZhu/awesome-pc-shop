@@ -57,9 +57,10 @@ AppAsset::register($this);
             <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
             <ul class="layui-nav layui-nav-tree"  lay-filter="test">
                 <li class="layui-nav-item layui-nav-itemed">
-                    <a class="" href="javascript:;">后台用户管理</a>
+                    <a class="" href="javascript:;">用户管理</a>
                     <dl class="layui-nav-child">
-                        <dd><a href="<?php echo \yii\helpers\Url::to(['backend/index'])?>" target="mainFrame">用户列表</a></dd>
+                        <dd><a href="<?php echo \yii\helpers\Url::to(['backend/index'])?>" target="mainFrame">后台用户列表</a></dd>
+                        <dd><a href="<?php echo \yii\helpers\Url::to(['backend/pc'])?>" target="mainFrame">前台用户列表</a></dd>
                     </dl>
                 </li>
                 <li class="layui-nav-item">
