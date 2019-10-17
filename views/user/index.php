@@ -39,7 +39,7 @@ AppAsset::register($this);
         }
 
         .login {
-            background-image: url("http://www.zydscjzx.cn/manage/images/login-1.jpg");
+            background-image: url("https://uploadfile.huiyi8.com/2014/0708/20140708050046711.jpg");
             width: 100%;
             background-position: 50%;
             background-size: cover; /*铺满*/

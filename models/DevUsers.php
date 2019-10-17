@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\interfaces\AdminArrayInterface;
 use Yii;
 
 /**
@@ -19,8 +20,13 @@ use Yii;
  * @property int $login_count 登录次数
  * @property int $hash_pwd 加密密码
  * @property int $role 角色
+ * @property int is_deleted
+ * @property string avatar
+ * @property string mobile
+ * @property string email
+ * @property int gender
  */
-class DevUsers extends \yii\db\ActiveRecord
+class DevUsers extends \yii\db\ActiveRecord implements AdminArrayInterface
 {
     /**
      * {@inheritdoc}
@@ -36,10 +42,11 @@ class DevUsers extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['status', 'lastvisit_time', 'register_time', 'login_count','role'], 'integer'],
+            [['status', 'lastvisit_time', 'register_time', 'login_count','role','is_deleted','gender'], 'integer'],
             [['username'], 'string', 'max' => 255],
+            [['avatar'], 'string', 'max' => 200],
+            [['email','mobile'], 'string', 'max' => 100],
             [['password', 'salt', 'register_ip', 'lastvisit_ip'], 'string', 'max' => 20],
-            [['hash_pwd'], 'string'],
         ];
     }
 
@@ -60,10 +67,32 @@ class DevUsers extends \yii\db\ActiveRecord
             'register_time' => 'Register Time',
             'login_count' => 'Login Count',
             'hash_pwd0' => 'Hash Pwd',
-            'role'=>'role'
+            'role'=>'role',
+            'is_deleted'=>'is_deleted',
+            'mobile'=>'mobile',
+            'email'=>'email',
+            'avatar'=>'avatar',
+            'gender'=>'gender'
         ];
     }
 
+    public function getAdminArray()
+    {
+        return [
+            'id' => $this->id,
+            'username' => $this->username,
+            'password' => $this->password,
+            'salt' => $this->salt,
+            'status' => $this->status,
+            'register_ip' => $this->register_ip,
+            'lastvisit_time' => $this->lastvisit_time,
+            'lastvisit_ip' => $this->lastvisit_ip,
+            'register_time' => $this->register_time,
+            'login_count' => $this->login_count,
+            'hash_pwd0' => $this->hash_pwd,
+            'role'=>$this->role
+        ];
+    }
     /**
      * 登录认证
      *
