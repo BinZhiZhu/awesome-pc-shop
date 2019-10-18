@@ -14,7 +14,7 @@ $config = [
         '@npm'   => '@vendor/npm-asset',
         '@casbin' => '@vendor/casbin',
         '@bin' => dirname(__DIR__),
-        '@adapter'=> '@vendor/yii-adapter'
+        '@adapter'=> '@vendor/yii-adapter',
     ],
     'modules' => [
         'api' => [

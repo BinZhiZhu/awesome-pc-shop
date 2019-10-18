@@ -163,7 +163,31 @@ AppAsset::register($this);
             flex-direction: column;
             line-height: 30px;
         }
-
+        .avatar-uploader .el-upload {
+            width: 80px;
+            height: 80px;
+            border: 1px dashed #d9d9d9;
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .avatar-uploader .el-upload:hover {
+            border-color: #409EFF;
+        }
+        .avatar-uploader-icon {
+            font-size: 28px;
+            color: #8c939d;
+            width: 178px;
+            height: 178px;
+            line-height: 178px;
+            text-align: center;
+        }
+        .avatar {
+            width: 80px;
+            height: 80px;
+            display: block;
+        }
     </style>
     <div id="app">
         <!--    首页容器布局-->
@@ -203,11 +227,13 @@ AppAsset::register($this);
                             <el-button type="primary" class="search-button">搜索</el-button>
                         </div>
                         <div class="link-balance__right">
-                            <el-button type="text" @click="loginUser">您好，请登录</el-button>
-                            <el-button type="text" @click="registerUser">注册</el-button>
-                            <el-button type="text" @click="">我的订单</el-button>
-                            <el-button type="text" @click="">购物车</el-button>
-                            <el-button type="text" @click="">我的信息</el-button>
+                            <el-button type="text" @click="loginUser" v-if="!is_login">您好，请登录</el-button>
+                            <el-button type="text" v-else="is_login">您好，{{user.username}}</el-button>
+                            <el-button type="text" @click="registerUser" v-if="!is_login">注册</el-button>
+                            <el-button type="text" @click="" v-if="is_login">我的订单</el-button>
+                            <el-button type="text" @click="" v-if="is_login">购物车</el-button>
+                            <el-button type="text" @click="userInfo" v-if="is_login">我的信息</el-button>
+                            <el-button type="text" @click="loginOut" v-if="is_login">退出</el-button>
                             <el-button type="text" @click="">中国鲜花礼品网:中国鲜花网领先品牌</el-button>
                         </div>
                         <el-dialog
@@ -258,6 +284,55 @@ AppAsset::register($this);
                                     <el-button type="primary" @click="submitLoginForm('form')">登录</el-button>
                                 </el-tooltip>
                                 <el-button @click="resetForm('form')">重置</el-button>
+                        </span>
+                        </el-dialog>
+<!--                        用户信息部分-->
+                        <el-dialog
+                                title="用户信息"
+                                :visible.sync="dialogUserInfoVisible"
+                                width="32%"
+                                center
+                                :before-close="handleClose"
+                        >
+                            <el-form :model="userForm" :rules="userRules" ref="userForm">
+                                <el-form-item label="头像" :label-width="formLabelWidth" prop="avatar">
+                                <el-upload
+                                        class="avatar-uploader"
+                                        action="https://jsonplaceholder.typicode.com/posts/"
+                                        :show-file-list="false"
+                                        auto-upload
+                                        :on-success="handleAvatarSuccess"
+                                        :before-upload="beforeAvatarUpload">
+                                    <img v-if="user.avatar" :src="user.avatar" class="avatar">
+                                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                                </el-upload>
+                                </el-form-item>
+                                <el-form-item label="账号" :label-width="formLabelWidth" prop="username">
+                                    <el-input v-model="user.username" disabled></el-input>
+                                </el-form-item>
+                                <el-form-item label="手机" :label-width="formLabelWidth" prop="mobile">
+                                    <el-input v-model="user.mobile" autocomplete="off"></el-input>
+                                </el-form-item>
+                                <el-form-item label="性别" :label-width="formLabelWidth" prop="gender">
+                                <el-select v-model="user.gender" placeholder="请选择">
+                                    <el-option
+                                            v-for="item in options"
+                                            :key="item.value"
+                                            :label="item.label"
+                                            :value="item.value">
+                                    </el-option>
+                                </el-select>
+                                </el-form-item>
+                                <el-form-item label="邮箱" :label-width="formLabelWidth" prop="email">
+                                    <el-input v-model="user.email" autocomplete="off"></el-input>
+                                </el-form-item>
+                                <el-form-item label="地址" :label-width="formLabelWidth" prop="address">
+                                    <el-input v-model="user.address" autocomplete="off"></el-input>
+                                </el-form-item>
+                            </el-form>
+                            <span slot="footer" class="dialog-footer">
+                            <el-button type="primary" @click="submitUserForm()">保存</el-button>
+                            <el-button @click="resetForm('userForm')">重置</el-button>
                         </span>
                         </el-dialog>
                     </div>
@@ -375,16 +450,68 @@ AppAsset::register($this);
                         callback();
                     }
                 };
+                //检验手机号码
+                var validateMobile= (rule, value, callback) => {
+                    if(value){
+                        if(!(/^1[3456789]\d{9}$/.test(value))){
+                            callback(new Error('手机号码格式有误，请重新填写'));
+                        }
+                    }
+                };
+                var validateEmail = (rule,vaule,callback) =>{
+                    if(vaule){
+                        var pattern = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+                        if(!pattern.test(vaule)){
+                            callback(new Error('邮箱格式有误，请重新填写'));
+                        }
+                    }
+                };
                 return {
+                    is_login: false,
+                    user: {},
+                    options: [
+                        {
+                            value: 0,
+                            label: '男'
+                        },
+                        {
+                            value: 1,
+                            label: '女'
+                        }
+                    ],
+                    imageUrl: '',
                     dialogVisible: false,
                     dialogRegisterVisible: false,
                     dialogLoginVisible: false,
+                    dialogUserInfoVisible: false,
                     input2: '',
                     formLabelWidth: '120px',
                     form: {
                         username: '',
                         password: '',
                         checkPass: ''
+                    },
+                    userForm: {
+                        email: '',
+                        address: '',
+                        mobile: '',
+                        gender: '',
+                        avatar: ''
+                    },
+                    //校验规则
+                    userRules: {
+                        mobile: [
+                            {
+                                validator: validateMobile,
+                                trigger: 'blur'
+                            }
+                        ],
+                        email: [
+                            {
+                                validator: validateEmail,
+                                trigger: 'blur'
+                            }
+                        ]
                     },
                     //校验规则
                     registerRules: {
@@ -425,7 +552,61 @@ AppAsset::register($this);
                     ],
                 };
             },
+            created: function(){
+                this.getUserInfo()
+            },
             methods: {
+                handleAvatarSuccess(res, file) {
+                    console.log('handleAvatarSuccess', res, file)
+                    this.user.avatar = URL.createObjectURL(file.raw);
+                    console.log('imageUrl', this.user.avatar)
+                    //生成了blob文件
+                    let url = '<?php echo \yii\helpers\Url::toRoute('pc/upload');?>';
+                    const data = new FormData();
+                    data.append('file',file.raw);
+                    axios.post(url,data)
+                        .then(response => {
+                            console.log('获取图片上传结果', response.data);
+                            const resp = response.data.result;
+                            this.user.avatar = resp.url
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        });
+
+
+                },
+                beforeAvatarUpload(file) {
+                    console.log('beforeAvatarUpload',file)
+                    const isJPG = file.type === 'image/jpeg';
+                    const isLt2M = file.size / 1024 / 1024 < 2;
+
+                    if (!isJPG) {
+                        this.$message.error('上传头像图片只能是 JPG 格式!');
+                    }
+                    if (!isLt2M) {
+                        this.$message.error('上传头像图片大小不能超过 2MB!');
+                    }
+                    return isJPG && isLt2M;
+                },
+                getUserInfo(){
+                    let url = '<?php echo \yii\helpers\Url::toRoute('pc/get-user-info');?>';
+                    let param = new URLSearchParams();
+                    axios.post(url)
+                        .then(response => {
+                            console.log('获取用户信息结果', response.data);
+                            const resp = response.data.result;
+                            this.is_login = resp.is_login;
+                            this.user = resp.user;
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        });
+                },
+                //查看我的信息
+                userInfo(){
+                    this.dialogUserInfoVisible = true
+                },
                 registerSuccess() {
                     this.$notify({
                         title: '注册成功',
@@ -440,9 +621,24 @@ AppAsset::register($this);
                         type: 'success',
                     });
                 },
+                loginOutSuccess() {
+                    this.$notify({
+                        title: '退出成功',
+                        message: '快登录账号，选择自己喜欢的花卉吧',
+                        type: 'success',
+                    });
+                },
+                saveInfoSuccess(){
+                    this.$notify({
+                        title: '保存用户信息成功',
+                        message: '快去查看你的信息吧',
+                        type: 'success',
+                    });
+                },
                 handleClose(done) {
                     this.dialogRegisterVisible = false
                     this.dialogLoginVisible = false
+                    this.dialogUserInfoVisible = false
                 },
                 alertMessage(msg, close, type) {
                     this.$message({
@@ -455,6 +651,22 @@ AppAsset::register($this);
                 registerUser() {
                     console.log('注册用户')
                     this.dialogRegisterVisible = true
+                },
+                //退出登录
+                loginOut() {
+                    console.log('退出账号')
+                    let url = '<?php echo \yii\helpers\Url::toRoute('pc/login-out');?>';
+                    let param = new URLSearchParams();
+                    axios.post(url)
+                        .then(response => {
+                            console.log('退出登录结果', response.data);
+                            this.loginOutSuccess()
+                            this.is_login = false;
+                            this.user = {}
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        });
                 },
                 //登录用户
                 loginUser() {
@@ -498,7 +710,7 @@ AppAsset::register($this);
                         }
                     });
                 },
-                //提交表单
+                //提交登录表单
                 submitLoginForm(formName) {
                     let loginUrl = '<?php echo \yii\helpers\Url::toRoute('pc/login');?>';
                     const postdata = {
@@ -519,6 +731,7 @@ AppAsset::register($this);
                                     if (response.data.code === 100) {
                                         this.loginSuccess();
                                         this.dialogLoginVisible = false
+                                        this.getUserInfo()
                                     } else if (response.data.code === -101) {
                                         this.alertMessage(response.data.message, true, 'error');
                                     }
@@ -533,6 +746,40 @@ AppAsset::register($this);
                             return false;
                         }
                     });
+                },
+                //提交用户信息表单
+                submitUserForm(formName) {
+                    console.log('submitUserForm',formName)
+                    let url = '<?php echo \yii\helpers\Url::toRoute('pc/edit-user-info');?>';
+                    const postData = {
+                        gender:this.user.gender,
+                        email: this.user.email,
+                        mobile: this.user.mobile,
+                        address: this.user.address,
+                        avatar: this.user.avatar,
+                    };
+                    let param = new URLSearchParams();
+                    param.append('gender', postData.gender);
+                    param.append('email', postData.email);
+                    param.append('mobile', postData.mobile);
+                    param.append('address', postData.address);
+                    param.append('avatar', postData.avatar);
+                    param.append('user_id', this.user.id);
+                    console.log('保存用户信息提交过去的参数', postData)
+                    axios.post(url, param)
+                        .then(response => {
+                            console.log('保存用户信息成功', response);
+                            if (response.data.code === 200) {
+                                this.saveInfoSuccess()
+                                this.dialogUserInfoVisible = false
+                                this.getUserInfo()
+                            }else {
+                                this.alertMessage(response.data.message, true, 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        });
                 },
                 //重置表单 移除校验结果
                 resetForm(formName) {

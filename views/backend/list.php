@@ -62,13 +62,22 @@ AppAsset::register($this);
         justify-content: center;
         padding-top: 20px;
     }
+    .tab{
+        padding: 20px;
+    }
 </style>
 <?php $this->beginBody() ?>
 <div id="app">
+    <div class="tab">
+        <el-breadcrumb separator-class="el-icon-arrow-right">
+            <el-breadcrumb-item :to="{ path: '/' }">用户管理</el-breadcrumb-item>
+            <el-breadcrumb-item>后台用户列表</el-breadcrumb-item>
+        </el-breadcrumb>
+    </div>
     <template>
-        <el-row>
-            <el-col :span="24"><div class="grid-content bg-purple-dark">后台用户列表管理</div></el-col>
-        </el-row>
+<!--        <el-row>-->
+<!--            <el-col :span="24"><div class="grid-content bg-purple-dark">后台用户列表</div></el-col>-->
+<!--        </el-row>-->
         <el-table
                 :data="tableData"
                 border="true"

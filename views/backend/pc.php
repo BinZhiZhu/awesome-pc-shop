@@ -55,7 +55,9 @@ AppAsset::register($this);
         padding: 10px 0;
         background-color: #f9fafc;
     }
-
+    .tab{
+        padding: 20px;
+    }
     .block{
         display: flex;
         flex-direction: row;
@@ -65,10 +67,16 @@ AppAsset::register($this);
 </style>
 <?php $this->beginBody() ?>
 <div id="app">
+    <div class="tab">
+        <el-breadcrumb separator-class="el-icon-arrow-right">
+            <el-breadcrumb-item :to="{ path: '/' }">用户管理</el-breadcrumb-item>
+            <el-breadcrumb-item>前台用户列表</el-breadcrumb-item>
+        </el-breadcrumb>
+    </div>
     <template>
-        <el-row>
-            <el-col :span="24"><div class="grid-content bg-purple-dark">前台用户列表管理</div></el-col>
-        </el-row>
+<!--        <el-row>-->
+<!--            <el-col :span="24"><div class="grid-content bg-purple-dark">前台用户列表管理</div></el-col>-->
+<!--        </el-row>-->
         <el-table
                 :data="tableData"
                 border="true"
