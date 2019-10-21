@@ -80,19 +80,29 @@ ElementUI::register($this);
         <div class="layui-side-scroll">
             <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
             <ul class="layui-nav layui-nav-tree"  lay-filter="test">
-                <li class="layui-nav-item layui-nav-itemed">
+                <?php if($user['role'] == \app\enums\RoleTypeEnum::ADMIN) { ?>
+                    <li class="layui-nav-item layui-nav-itemed">
                     <a class="" href="javascript:;">用户管理</a>
                     <dl class="layui-nav-child">
                         <dd><a href="<?php echo \yii\helpers\Url::to(['backend/index'])?>" target="mainFrame">后台用户列表</a></dd>
                         <dd><a href="<?php echo \yii\helpers\Url::to(['backend/pc'])?>" target="mainFrame">前台用户列表</a></dd>
                     </dl>
                 </li>
-                <li class="layui-nav-item">
+                 <li class="layui-nav-item">
                     <a href="javascript:;">订单管理</a>
                     <dl class="layui-nav-child">
                         <dd><a href="javascript:;">订单列表</a></dd>
                     </dl>
                 </li>
+           <?php } ?>
+                <?php if($user['role'] == \app\enums\RoleTypeEnum::MERCHANT) { ?>
+                <li class="layui-nav-item">
+                    <a href="javascript:;">商品管理</a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="javascript:;">发布商品</a></dd>
+                    </dl>
+                </li>
+            <?php } ?>
                 <li class="layui-nav-item"><a href="">帮助</a></li>
                 <li class="layui-nav-item"><a href="">关于我们</a></li>
             </ul>
@@ -102,7 +112,7 @@ ElementUI::register($this);
     <div class="layui-body">
         <!-- 内容主体区域 -->
 <!--        <div style="padding: 15px;">内容主体区域</div>-->
-        <iframe id="mainFrame" name="mainFrame" src="<?php echo \yii\helpers\Url::to(['backend/index'])?>" style="overflow: visible;" scrolling="auto" frameborder="no" width="100%" height="100%"></iframe>
+        <iframe id="mainFrame" name="mainFrame" src="<?php echo $user['role'] == \app\enums\RoleTypeEnum::ADMIN ? \yii\helpers\Url::to(['backend/index']) : \yii\helpers\Url::to(['main/index'])?>" style="overflow: visible;" scrolling="auto" frameborder="no" width="100%" height="100%"></iframe>
 
     </div>
 
