@@ -485,6 +485,7 @@ AppAsset::register($this);
                 };
                 return {
                     is_login: false,
+                    realAvatar: '',
                     user: {},
                     options: [
                         {
@@ -585,13 +586,11 @@ AppAsset::register($this);
                         .then(response => {
                             console.log('获取图片上传结果', response.data);
                             const resp = response.data.result;
-                            this.user.avatar = resp.url
+                            this.realAvatar = resp.url
                         })
                         .catch(error => {
                             console.log(error)
                         });
-
-
                 },
                 beforeAvatarUpload(file) {
                     console.log('beforeAvatarUpload',file)
@@ -773,7 +772,7 @@ AppAsset::register($this);
                         email: this.user.email,
                         mobile: this.user.mobile,
                         address: this.user.address,
-                        avatar: this.user.avatar,
+                        avatar: this.realAvatar
                     };
                     let param = new URLSearchParams();
                     param.append('gender', postData.gender);

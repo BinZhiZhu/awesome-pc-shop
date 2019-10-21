@@ -327,9 +327,10 @@ class PcController extends Controller
 
             // 设置文件的保存路径
             //如果文件是中文文件名，则需要使用 iconv() 函数将文件名转换为 gbk 编码，否则将会出现乱码
+//            $base_dir = '/uploads/' . date("Y-m-d") . '/';
             $base_dir = '/uploads/' . date("Y-m-d") . '/';
 
-            $dir = Yii::getAlias('@root') . '/web/' . $base_dir;
+            $dir = Yii::getAlias('@root') . '/web' . $base_dir;
 
             // 确保有读写权限咯
             if (!is_dir($dir)) {
@@ -337,7 +338,9 @@ class PcController extends Controller
                 @mkdir($dir, 0777, true);
             }
 
-            $destination = $dir . iconv('UTF-8', 'gbk', time() . '_' . basename($file['name']));
+            $base_time = time();
+
+            $destination = $dir . iconv('UTF-8', 'gbk', $base_time . '_' . basename($file['name']));
 
             Yii::debug("生成的文件路径：" . $dir, __METHOD__);
 
@@ -345,7 +348,7 @@ class PcController extends Controller
                 // 将用户上传的文件保存到 upload 目录中
                 if (move_uploaded_file($file['tmp_name'], $destination)) {
 
-                    $url = Yii::$app->request->getHostInfo() . $base_dir . $file['name'];
+                    $url = Yii::$app->request->getHostInfo() . $base_dir . $base_time.'_'.$file['name'];
 
                     $baseFile = new BaseFile();
                     $baseFile->url = trim($url);

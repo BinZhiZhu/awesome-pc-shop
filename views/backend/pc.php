@@ -64,6 +64,44 @@ AppAsset::register($this);
         justify-content: center;
         padding-top: 20px;
     }
+    .avatar-uploader .el-upload {
+        width: 80px;
+        height: 80px;
+        border: 1px dashed #d9d9d9;
+        border-radius: 6px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+    .avatar-uploader .el-upload:hover {
+        border-color: #409EFF;
+    }
+    .avatar-uploader-icon {
+        font-size: 28px;
+        color: #8c939d;
+        width: 178px;
+        height: 178px;
+        line-height: 178px;
+        text-align: center;
+    }
+    .avatar {
+        width: 80px;
+        height: 80px;
+        display: block;
+    }
+
+    .link-balance__right{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+    .user-avatar{
+        align-items: center;
+        padding-right: 20px;
+    }
+    .el-dialog{
+        margin-top: 10px !important;
+    }
 </style>
 <?php $this->beginBody() ?>
 <div id="app">
@@ -170,6 +208,54 @@ AppAsset::register($this);
                 </template>
             </el-table-column>
         </el-table>
+        <el-dialog
+                title="用户信息"
+                :visible.sync="dialogUserInfoVisible"
+                width="32%"
+                center
+                :before-close="handleClose"
+        >
+            <el-form :model="userForm" :rules="userRules" ref="userForm">
+                <el-form-item label="头像" :label-width="formLabelWidth" prop="avatar">
+                    <el-upload
+                            class="avatar-uploader"
+                            :show-file-list="false"
+                            auto-upload
+                            action="https://jsonplaceholder.typicode.com/posts/"
+                            :on-success="handleAvatarSuccess"
+                            :before-upload="beforeAvatarUpload">
+                        <img v-if="user.avatar" :src="user.avatar" class="avatar">
+                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                    </el-upload>
+                </el-form-item>
+                <el-form-item label="账号" :label-width="formLabelWidth" prop="username">
+                    <el-input v-model="user.username" disabled></el-input>
+                </el-form-item>
+                <el-form-item label="手机" :label-width="formLabelWidth" prop="mobile">
+                    <el-input v-model="user.mobile" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="性别" :label-width="formLabelWidth" prop="gender">
+                    <el-select v-model="user.gender" placeholder="请选择">
+                        <el-option
+                                v-for="item in options"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="邮箱" :label-width="formLabelWidth" prop="email">
+                    <el-input v-model="user.email" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="地址" :label-width="formLabelWidth" prop="address">
+                    <el-input v-model="user.address" autocomplete="off"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                            <el-button type="primary" @click="submitUserForm()">保存</el-button>
+                            <el-button @click="resetForm('userForm')">重置</el-button>
+                        </span>
+        </el-dialog>
     </template>
     <div class="block">
         <el-pagination
@@ -194,9 +280,61 @@ AppAsset::register($this);
         el: '#app',
         router,
         data() {
+            //检验手机号码
+            var validateMobile= (rule, value, callback) => {
+                if(value){
+                    if(!(/^1[3456789]\d{9}$/.test(value))){
+                        callback(new Error('手机号码格式有误，请重新填写'));
+                    }
+                }
+            };
+            var validateEmail = (rule,vaule,callback) =>{
+                if(vaule){
+                    var pattern = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+                    if(!pattern.test(vaule)){
+                        callback(new Error('邮箱格式有误，请重新填写'));
+                    }
+                }
+            };
             return {
                 page:1,
                 total:"",
+                realAvatar: '',
+                dialogUserInfoVisible: false,
+                formLabelWidth: '120px',
+                user: {},
+                options: [
+                    {
+                        value: 0,
+                        label: '男'
+                    },
+                    {
+                        value: 1,
+                        label: '女'
+                    }
+                ],
+                userForm: {
+                    email: '',
+                    address: '',
+                    mobile: '',
+                    gender: '',
+                    avatar: ''
+                },
+                //校验规则
+                userRules: {
+                    mobile: [
+                        {
+                            validator: validateMobile,
+                            trigger: 'blur'
+                        }
+                    ],
+                    email: [
+                        {
+                            validator: validateEmail,
+                            trigger: 'blur'
+                        }
+                    ]
+                },
                 tableData: [
                     {
                         id: 0,
@@ -229,6 +367,47 @@ AppAsset::register($this);
                 });
         },
         methods: {
+            handleAvatarSuccess(res, file) {
+                console.log('handleAvatarSuccess', res, file)
+                this.user.avatar = URL.createObjectURL(file.raw);
+                console.log('imageUrl', this.user.avatar)
+                //生成了blob文件
+                let url = '<?php echo \yii\helpers\Url::toRoute('pc/upload');?>';
+                const data = new FormData();
+                data.append('file',file.raw);
+                axios.post(url,data)
+                    .then(response => {
+                        console.log('获取图片上传结果', response.data);
+                        const resp = response.data.result;
+                        this.realAvatar = resp.url
+                    })
+                    .catch(error => {
+                        console.log(error)
+                    });
+            },
+            beforeAvatarUpload(file) {
+                console.log('beforeAvatarUpload',file)
+                const isJPG = file.type === 'image/jpeg';
+                const isLt2M = file.size / 1024 / 1024 < 2;
+
+                if (!isJPG) {
+                    this.$message.error('上传头像图片只能是 JPG 格式!');
+                }
+                if (!isLt2M) {
+                    this.$message.error('上传头像图片大小不能超过 2MB!');
+                }
+                return isJPG && isLt2M;
+            },
+            handleClose(done) {
+                this.dialogUserInfoVisible = false
+            },
+            saveInfoSuccess(){
+                this.$notify({
+                    title: '保存用户信息成功',
+                    message: '',
+                    type: 'success',
+                });
+            },
             prev_click(){
                 var page = parseInt(app.page)-1;
                 let url = '<?php echo \yii\helpers\Url::toRoute('backend/get-app-user-list');?>';
@@ -268,6 +447,8 @@ AppAsset::register($this);
             },
             handleEdit(index, row) {
                 console.log(index, row);
+                this.dialogUserInfoVisible = true
+                this.user = row
             },
             handleDelete(index, row) {
                 console.log(index, row);
@@ -288,6 +469,44 @@ AppAsset::register($this);
                         console.log(error)
 
                     });
+            },
+            //提交用户信息表单
+            submitUserForm(formName) {
+                console.log('submitUserForm',formName)
+                let url = '<?php echo \yii\helpers\Url::toRoute('pc/edit-user-info');?>';
+                const postData = {
+                    gender:this.user.gender,
+                    email: this.user.email,
+                    mobile: this.user.mobile,
+                    address: this.user.address,
+                    avatar: this.realAvatar
+                };
+                let param = new URLSearchParams();
+                param.append('gender', postData.gender);
+                param.append('email', postData.email);
+                param.append('mobile', postData.mobile);
+                param.append('address', postData.address);
+                param.append('avatar', postData.avatar);
+                param.append('user_id', this.user.id);
+                console.log('保存用户信息提交过去的参数', postData)
+                axios.post(url, param)
+                    .then(response => {
+                        console.log('保存用户信息成功', response);
+                        if (response.data.code === 200) {
+                            this.saveInfoSuccess()
+                            this.dialogUserInfoVisible = false
+                            this.getUserInfo()
+                        }else {
+                            this.alertMessage(response.data.message, true, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error)
+                    });
+            },
+            //重置表单 移除校验结果
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
             }
         },
     });
