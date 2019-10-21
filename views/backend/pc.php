@@ -97,8 +97,10 @@ AppAsset::register($this);
             <el-table-column
                     label="头像"
                     align="center"
-                    width="100">
-                <template slot-scope="scope">{{scope.row.avatar}}</template>
+                    width="80">
+                <template slot-scope="scope">
+                    <el-avatar :src="scope.row.avatar" ></el-avatar>
+                </template>
             </el-table-column>
             <el-table-column
                     label="性别"
@@ -109,20 +111,20 @@ AppAsset::register($this);
             <el-table-column
                     label="电话"
                     align="center"
-                    width="150">
+                    width="130">
                 <template slot-scope="scope">{{scope.row.mobile}}</template>
             </el-table-column>
             <el-table-column
                     label="邮箱"
                     align="center"
-                    width="150">
+                    width="160">
                 <template slot-scope="scope">{{scope.row.email}}</template>
             </el-table-column>
             <el-table-column
                     label="地址"
                     align="center"
                     width="180">
-                <template slot-scope="scope">{{scope.row.email}}</template>
+                <template slot-scope="scope">{{scope.row.address}}</template>
             </el-table-column>
             <el-table-column
                     label="登录次数"
@@ -133,9 +135,8 @@ AppAsset::register($this);
             <el-table-column
                     label="注册日期"
                     align="center"
-                    width="180">
+                    width="150">
                 <template slot-scope="scope">
-                    <i class="el-icon-time"></i>
                     <span style="margin-left: 10px">{{ scope.row.register_time }}</span>
                 </template>
             </el-table-column>

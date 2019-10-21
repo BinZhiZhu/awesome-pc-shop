@@ -48,7 +48,7 @@ AppAsset::register($this);
 <!--                    <dd><a href="">安全设置</a></dd>-->
 <!--                </dl>-->
             </li>
-            <li class="layui-nav-item"><a href="<?php echo \yii\helpers\Url::to(['user/index'])?>">退出</a></li>
+            <li class="layui-nav-item"><a href="<?php echo \yii\helpers\Url::to(['user/login-out'])?>">退出</a></li>
         </ul>
     </div>
 

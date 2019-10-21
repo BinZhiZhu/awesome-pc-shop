@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\DevUsers;
+use yii\helpers\Url;
 use yii\web\Controller;
 use Yii;
 
@@ -26,7 +27,7 @@ class AdminController extends Controller
             //TODO 找不到先跳登录页
             if(!$user){
                 Yii::$app->view->title = 'Admin管理系统';
-                return $this->redirect('user/index');
+                return Url::to('user/index');
             }
 
             Yii::debug("当前用户信息".var_export($user->toArray(),true),__METHOD__);
@@ -37,7 +38,7 @@ class AdminController extends Controller
             ]);
         } else {
             Yii::$app->view->title = 'Admin管理系统';
-            return $this->redirect('user/index');
+            return Url::to('user/index');
         }
 
     }

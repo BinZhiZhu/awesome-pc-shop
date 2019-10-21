@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\DevUsers;
+use yii\helpers\Url;
 use yii\web\Controller;
 use Exception;
 use Yii;
@@ -14,14 +15,22 @@ class UserController extends Controller
 
     public function actionIndex()
     {
-        //统一清除session
-        Yii::$app->session->destroy();
 
         Yii::$app->view->title = 'Admin管理系统';
         $host = Yii::$app->request->getAbsoluteUrl();//绝对路径
         return $this->render('index', [
             'host' => $host
         ]);
+    }
+
+    public function actionLoginOut()
+    {
+        //统一清除session
+       $session = Yii::$app->session;
+
+       $session->destroySession('is_user_id');
+
+       return $this->redirect(Url::toRoute('user/index'));
     }
 
     /**

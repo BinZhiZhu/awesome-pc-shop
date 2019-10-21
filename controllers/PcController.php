@@ -4,7 +4,6 @@ namespace app\controllers;
 
 use app\models\AppUsers;
 use app\models\BaseFile;
-use app\models\DevUsers;
 use Exception;
 use yii\base\InvalidConfigException;
 use yii\web\Controller;
@@ -32,7 +31,8 @@ class PcController extends Controller
     public function actionLoginOut()
     {
         $session = Yii::$app->session;
-        $session->destroy();
+
+        $session->destroySession('is_app_user_id');
 
         return Yii::createObject([
             'class' => 'yii\web\Response',
@@ -177,7 +177,7 @@ class PcController extends Controller
 
         //有该用户且通过密码校验
         if ($user['password'] === md5($password) && $justifyPwd) {
-            DevUsers::updateAll(
+            AppUsers::updateAll(
                 [
                     'lastvisit_ip' => Yii::$app->request->getUserIP(),
                     'lastvisit_time' => time(),

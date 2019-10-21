@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\enums\GenderTypeEnum;
 use app\enums\RoleTypeEnum;
 use app\enums\StatusTypeEnum;
 use app\models\AppUsers;
@@ -90,6 +91,7 @@ class BackendController extends Controller
             $user['register_time'] = date("Y:m:d H:i", $user['register_time']);
             $user['lastvisit_time'] = date("Y:m:d H:i", $user['lastvisit_time']);
             $user['host_info'] = Yii::$app->request->getHostInfo();
+            $user['gender'] = ArrayHelper::getValue(GenderTypeEnum::$list,$user['gender']);
         }
 
         unset($user);

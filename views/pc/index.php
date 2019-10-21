@@ -98,7 +98,6 @@ AppAsset::register($this);
         }
 
         .link-balance__right a {
-            padding-left: 10px;
             /*color: #737373;*/
         }
 
@@ -188,6 +187,19 @@ AppAsset::register($this);
             height: 80px;
             display: block;
         }
+
+        .link-balance__right{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+        .user-avatar{
+            align-items: center;
+            padding-right: 20px;
+        }
+        .user-button{
+
+        }
     </style>
     <div id="app">
         <!--    首页容器布局-->
@@ -227,14 +239,19 @@ AppAsset::register($this);
                             <el-button type="primary" class="search-button">搜索</el-button>
                         </div>
                         <div class="link-balance__right">
-                            <el-button type="text" @click="loginUser" v-if="!is_login">您好，请登录</el-button>
-                            <el-button type="text" v-else="is_login">您好，{{user.username}}</el-button>
-                            <el-button type="text" @click="registerUser" v-if="!is_login">注册</el-button>
-                            <el-button type="text" @click="" v-if="is_login">我的订单</el-button>
-                            <el-button type="text" @click="" v-if="is_login">购物车</el-button>
-                            <el-button type="text" @click="userInfo" v-if="is_login">我的信息</el-button>
-                            <el-button type="text" @click="loginOut" v-if="is_login">退出</el-button>
-                            <el-button type="text" @click="">中国鲜花礼品网:中国鲜花网领先品牌</el-button>
+                            <div class="user-avatar">
+                                <el-avatar :src="user.avatar" v-if="is_login && user.avatar"></el-avatar>
+                            </div>
+                            <div class="user-button">
+                                <el-button type="text" @click="loginUser" v-if="!is_login">您好，请登录</el-button>
+                                <el-button type="text" v-else="is_login">您好，{{user.username}}</el-button>
+                                <el-button type="text" @click="registerUser" v-if="!is_login">注册</el-button>
+                                <el-button type="text" @click="" v-if="is_login">我的订单</el-button>
+                                <el-button type="text" @click="" v-if="is_login">购物车</el-button>
+                                <el-button type="text" @click="userInfo" v-if="is_login">我的信息</el-button>
+                                <el-button type="text" @click="loginOut" v-if="is_login">退出</el-button>
+                                <el-button type="text" @click="">中国鲜花礼品网:中国鲜花网领先品牌</el-button>
+                            </div>
                         </div>
                         <el-dialog
                                 title="用户注册"
