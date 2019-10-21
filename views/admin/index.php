@@ -99,7 +99,8 @@ ElementUI::register($this);
                 <li class="layui-nav-item">
                     <a href="javascript:;">商品管理</a>
                     <dl class="layui-nav-child">
-                        <dd><a href="javascript:;">发布商品</a></dd>
+                        <dd><a href="<?php echo \yii\helpers\Url::to(['goods/index'])?>" target="mainFrame">发布商品</a></dd>
+                        <dd><a href="<?php echo \yii\helpers\Url::to(['goods/list'])?>" target="mainFrame">商品列表</a></dd>
                     </dl>
                 </li>
             <?php } ?>
