@@ -65,6 +65,9 @@ AppAsset::register($this);
     .tab{
         padding: 20px;
     }
+    .el-dialog{
+        margin-top: 10px !important;
+    }
 </style>
 <?php $this->beginBody() ?>
 <div id="app">
@@ -143,7 +146,7 @@ AppAsset::register($this);
                 <template slot-scope="scope">
                     <el-button
                             size="mini"
-                            @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                            @click="handleEdit(scope.$index, scope.row)">查看</el-button>
                     <el-button
                             size="mini"
                             type="danger"
@@ -151,6 +154,37 @@ AppAsset::register($this);
                 </template>
             </el-table-column>
         </el-table>
+        <el-dialog
+                title="用户信息"
+                :visible.sync="dialogUserInfoVisible"
+                width="32%"
+                center
+                :before-close="handleClose"
+        >
+            <el-form :model="userForm" :rules="userRules" ref="userForm">
+                <el-form-item label="编号" :label-width="formLabelWidth" prop="username">
+                    <el-input v-model="user.id" disabled></el-input>
+                </el-form-item>
+            </el-form>
+            <el-form :model="userForm" :rules="userRules" ref="userForm">
+                <el-form-item label="账号" :label-width="formLabelWidth" prop="username">
+                    <el-input v-model="user.username" disabled></el-input>
+                </el-form-item>
+            </el-form>
+            <el-form :model="userForm" :rules="userRules" ref="userForm">
+                <el-form-item label="角色" :label-width="formLabelWidth" prop="role">
+                    <el-input v-model="user.role_name" disabled></el-input>
+                </el-form-item>
+            </el-form>
+            <el-form :model="userForm" :rules="userRules" ref="userForm">
+                <el-form-item label="登录次数" :label-width="formLabelWidth" prop="role">
+                    <el-input v-model="user.login_count" disabled></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                    <el-button type="primary" @click="handleClose">关闭</el-button>
+            </span>
+        </el-dialog>
     </template>
     <div class="block">
         <el-pagination
@@ -175,9 +209,49 @@ AppAsset::register($this);
         el: '#app',
         router,
         data() {
+            //检验手机号码
+            var validateMobile= (rule, value, callback) => {
+                if(value){
+                    if(!(/^1[3456789]\d{9}$/.test(value))){
+                        callback(new Error('手机号码格式有误，请重新填写'));
+                    }
+                }
+            };
+            var validateEmail = (rule,vaule,callback) =>{
+                if(vaule){
+                    var pattern = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+                    if(!pattern.test(vaule)){
+                        callback(new Error('邮箱格式有误，请重新填写'));
+                    }
+                }
+            };
             return {
                 page:1,
                 total:"",
+                dialogUserInfoVisible: false,
+                formLabelWidth: '120px',
+                user: {},
+                userForm: {
+                    email: '',
+                    address: '',
+                    mobile: '',
+                    gender: '',
+                },
+                //校验规则
+                userRules: {
+                    mobile: [
+                        {
+                            validator: validateMobile,
+                            trigger: 'blur'
+                        }
+                    ],
+                    email: [
+                        {
+                            validator: validateEmail,
+                            trigger: 'blur'
+                        }
+                    ]
+                },
                 tableData: [
                     {
                         id: 0,
@@ -210,6 +284,16 @@ AppAsset::register($this);
                 });
         },
         methods: {
+            handleClose(done) {
+                this.dialogUserInfoVisible = false
+            },
+            saveInfoSuccess(){
+                this.$notify({
+                    title: '保存用户信息成功',
+                    message: '',
+                    type: 'success',
+                });
+            },
             prev_click(){
                 var page = parseInt(app.page)-1;
                 let url = '<?php echo \yii\helpers\Url::toRoute('backend/get-user-list');?>';
@@ -249,6 +333,46 @@ AppAsset::register($this);
             },
             handleEdit(index, row) {
                 console.log(index, row);
+                this.dialogUserInfoVisible = true
+                this.user = row
+            },
+            //提交用户信息表单
+            submitUserForm(formName) {
+                console.log('submitUserForm',formName)
+                let url = '<?php echo \yii\helpers\Url::toRoute('pc/edit-user-info');?>';
+                const postData = {
+                    gender:this.user.gender,
+                    email: this.user.email,
+                    mobile: this.user.mobile,
+                    address: this.user.address,
+                    avatar: this.realAvatar
+                };
+                let param = new URLSearchParams();
+                param.append('gender', postData.gender);
+                param.append('email', postData.email);
+                param.append('mobile', postData.mobile);
+                param.append('address', postData.address);
+                param.append('avatar', postData.avatar);
+                param.append('user_id', this.user.id);
+                console.log('保存用户信息提交过去的参数', postData)
+                axios.post(url, param)
+                    .then(response => {
+                        console.log('保存用户信息成功', response);
+                        if (response.data.code === 200) {
+                            this.saveInfoSuccess()
+                            this.dialogUserInfoVisible = false
+                            this.getUserInfo()
+                        }else {
+                            this.alertMessage(response.data.message, true, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error)
+                    });
+            },
+            //重置表单 移除校验结果
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
             },
             handleDelete(index, row) {
                 console.log(index, row);
