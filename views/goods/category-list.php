@@ -249,19 +249,22 @@ AppAsset::register($this);
         },
         created: function () {
             // `this` 指向 vm 实例
-            let url = '<?php echo \yii\helpers\Url::toRoute('goods/get-category-list');?>';
-            axios.post(url)
-                .then(response => {
-                    const resp = response.data;
-                    console.log('success', resp);
-                    this.tableData = resp.result.list
-                    this.total = resp.result.total
-                })
-                .catch(error => {
-                    console.log(error)
-                });
+            this.getCategoryList()
         },
         methods: {
+            getCategoryList() {
+                let url = '<?php echo \yii\helpers\Url::toRoute('goods/get-category-list');?>';
+                axios.post(url)
+                    .then(response => {
+                        const resp = response.data;
+                        console.log('success', resp);
+                        this.tableData = resp.result.list
+                        this.total = resp.result.total
+                    })
+                    .catch(error => {
+                        console.log(error)
+                    });
+            },
             prev_click() {
                 var page = parseInt(app.page) - 1;
                 let url = '<?php echo \yii\helpers\Url::toRoute('backend/get-user-list');?>';
@@ -344,7 +347,7 @@ AppAsset::register($this);
             },
             handleDelete(index, row) {
                 console.log(index, row);
-                let url = '<?php echo \yii\helpers\Url::toRoute('backend/delete-user');?>';
+                let url = '<?php echo \yii\helpers\Url::toRoute('goods/delete-category');?>';
                 let param = new URLSearchParams();
                 const postdata = {
                     id: row.id
@@ -355,11 +358,15 @@ AppAsset::register($this);
                     .then(response => {
                         const resp = response.data;
                         console.log('success', resp);
-                        this.alertMessage(resp.message, true, resp.code === 200 ? 'success' : 'error')
+                        this.getCategoryList()
+                        if (resp.code === 200) {
+                            this.alertMessage(resp.message, true, 'success')
+                        } else {
+                            this.alertMessage(resp.message, true, 'error')
+                        }
                     })
                     .catch(error => {
                         console.log(error)
-
                     });
             }
         },

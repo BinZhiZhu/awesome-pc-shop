@@ -554,5 +554,47 @@ class GoodsController extends Controller
 
     }
 
+    /**
+     * 删除分类
+     *
+     * @return object
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function actionDeleteCategory()
+    {
+        $category_id = Yii::$app->request->post('id');
+
+        $category_id = intval($category_id);
+
+        $category = GoodsCategoryEntity::findOne([
+            'id' => $category_id
+        ]);
+
+        if (!$category) {
+            return Yii::createObject([
+                'class' => 'yii\web\Response',
+                'format' => \yii\web\Response::FORMAT_JSON,
+                'data' => [
+                    'code' => -200,
+                    'message' => '分类不存在',
+                    'result' => []
+                ]
+            ]);
+        }
+
+        $category->is_deleted = StatusTypeEnum::ON;
+        $category->save(false);
+
+        return Yii::createObject([
+            'class' => 'yii\web\Response',
+            'format' => \yii\web\Response::FORMAT_JSON,
+            'data' => [
+                'code' => -200,
+                'message' => '删除成功',
+                'result' => []
+            ]
+        ]);
+    }
+
 
 }
