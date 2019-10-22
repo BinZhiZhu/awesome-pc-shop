@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\enums\RoleTypeEnum;
 use app\enums\StatusTypeEnum;
 use app\models\DevUsers;
+use app\models\GoodsCategoryEntity;
 use app\models\GoodsEntity;
 use Yii;
 use yii\web\Controller;
@@ -19,6 +20,17 @@ class GoodsController extends Controller
     {
         return $this->render('index');
     }
+
+    public function actionCategory()
+    {
+        return $this->render('category');
+    }
+
+    public function actionCategoryList()
+    {
+        return $this->render('category-list');
+    }
+
 
     public function actionList()
     {
@@ -68,6 +80,54 @@ class GoodsController extends Controller
                 'result' => [
                     'list' => $goods,
                     'total' => count($goods)
+                ]
+            ]
+        ]);
+    }
+
+    /**
+     * 获取商品分类列表
+     *
+     * @return object
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function actionGetCategoryList()
+    {
+        $session = Yii::$app->session;
+        $array = $session->get('is_user_id');
+        $user_id = $array['value'];
+
+        $user = DevUsers::findOne($user_id);
+        if (!$user) {
+            //TODO
+        }
+
+        $categorys = GoodsCategoryEntity::find()
+            ->where([
+                'status' => StatusTypeEnum::ON,
+                'is_deleted' => StatusTypeEnum::OFF
+            ])
+            ->andWhere(['created_by' => $user->id])
+            ->orderBy(['id' => SORT_DESC])
+            ->asArray()
+            ->all();
+
+        foreach ($categorys as &$category) {
+            $category['created_at'] = date("Y:m:d H:i", $category['created_at']);
+            $category['updated_at'] = date("Y:m:d H:i", $category['updated_at']);
+            $category['created_by'] = $user->username;
+        }
+
+        unset($category);
+
+        return Yii::createObject([
+            'class' => 'yii\web\Response',
+            'format' => \yii\web\Response::FORMAT_JSON,
+            'data' => [
+                'code' => 200,
+                'result' => [
+                    'list' => $categorys,
+                    'total' => count($categorys)
                 ]
             ]
         ]);
@@ -314,5 +374,185 @@ class GoodsController extends Controller
             ]
         ]);
     }
+
+    /**
+     * 添加商品分类
+     *
+     * @return object
+     * @throws \yii\base\InvalidConfigException
+     * @throws \Throwable
+     */
+    public function actionAddCategory()
+    {
+        $title = Yii::$app->request->post('title');
+
+        $session = Yii::$app->session;
+
+        $array = $session->get('is_user_id');
+
+        $user_id = $array['value'];
+
+        $title = trim($title);
+        $user_id = intval($user_id);
+
+        //商家才能发布商品
+        $user = DevUsers::findOne([
+            'id' => $user_id,
+        ]);
+
+        if (!$user) {
+            return Yii::createObject([
+                'class' => 'yii\web\Response',
+                'format' => \yii\web\Response::FORMAT_JSON,
+                'data' => [
+                    'code' => -200,
+                    'message' => '用户不存在',
+                    'result' => []
+                ]
+            ]);
+        }
+
+        if ($user->role !== RoleTypeEnum::ADMIN) {
+            return Yii::createObject([
+                'class' => 'yii\web\Response',
+                'format' => \yii\web\Response::FORMAT_JSON,
+                'data' => [
+                    'code' => -200,
+                    'message' => '您没有权限发布商品',
+                    'result' => []
+                ]
+            ]);
+        }
+
+        $category = GoodsCategoryEntity::findOne([
+            'title' => $title
+        ]);
+
+        if ($category) {
+            $category->updated_at = time();
+            $category->save(false);
+
+            return Yii::createObject([
+                'class' => 'yii\web\Response',
+                'format' => \yii\web\Response::FORMAT_JSON,
+                'data' => [
+                    'code' => -200,
+                    'message' => '该商品分类已存在，请重新添加',
+                    'result' => []
+                ]
+            ]);
+        }
+
+        $category = new GoodsCategoryEntity();
+        $category->created_at = time();
+        $category->created_by = $user_id;
+        $category->title = $title;
+        $category->status = StatusTypeEnum::ON;
+        $category->updated_at = time();
+
+        Yii::$app->getDb()->transaction(function () use ($category) {
+            $category->save(false);
+        });
+
+        return Yii::createObject([
+            'class' => 'yii\web\Response',
+            'format' => \yii\web\Response::FORMAT_JSON,
+            'data' => [
+                'code' => 200,
+                'message' => "添加商品分类【{$category->title}】成功",
+                'result' => [
+                    'category' => $category,
+                    'user_id' => $user_id
+                ]
+            ]
+        ]);
+    }
+
+    /**
+     * 编辑分类
+     *
+     * @return object
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function actionEditCategory()
+    {
+        $title = Yii::$app->request->post('title');
+        $category_id = Yii::$app->request->post('category_id');
+
+        $session = Yii::$app->session;
+
+        $array = $session->get('is_user_id');
+
+        $user_id = $array['value'];
+
+        $title = trim($title);
+        $category_id = intval($category_id);
+
+        //管理员才能编辑分类
+        $user = DevUsers::findOne([
+            'id' => $user_id,
+        ]);
+
+        if (!$user) {
+            return Yii::createObject([
+                'class' => 'yii\web\Response',
+                'format' => \yii\web\Response::FORMAT_JSON,
+                'data' => [
+                    'code' => -200,
+                    'message' => '用户不存在',
+                    'result' => []
+                ]
+            ]);
+        }
+
+        if ($user->role !== RoleTypeEnum::ADMIN) {
+            return Yii::createObject([
+                'class' => 'yii\web\Response',
+                'format' => \yii\web\Response::FORMAT_JSON,
+                'data' => [
+                    'code' => -200,
+                    'message' => '您没有权限发布商品',
+                    'result' => []
+                ]
+            ]);
+        }
+
+
+        $category = GoodsCategoryEntity::findOne([
+            'id' => $category_id,
+            'status' => StatusTypeEnum::ON
+        ]);
+
+        if (!$category) {
+            return Yii::createObject([
+                'class' => 'yii\web\Response',
+                'format' => \yii\web\Response::FORMAT_JSON,
+                'data' => [
+                    'code' => -200,
+                    'message' => '分类不存在',
+                    'result' => []
+                ]
+            ]);
+        }
+
+        $category->updated_at = time();
+        $category->title = $title;
+        $category->save(false);
+
+        return Yii::createObject([
+            'class' => 'yii\web\Response',
+            'format' => \yii\web\Response::FORMAT_JSON,
+            'data' => [
+                'code' => 200,
+                'message' => "商品分类【{$category->title}】更新成功",
+                'result' => [
+                    'category' => $category,
+                    'user_id' => $user_id
+                ]
+            ]
+        ]);
+
+    }
+
 
 }
