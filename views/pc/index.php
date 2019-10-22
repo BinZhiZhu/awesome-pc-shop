@@ -414,12 +414,14 @@ AppAsset::register($this);
                         </template>
                         <!-- 商品图片-->
                         <div class="goods-balance">
-                            <div class="goods-balance__item" v-for="item in goodsImgs">
-                                <img :src="item" alt="" class="goodsImg">
+                            <div class="goods-balance__item" v-for="item in goodsList">
+                                <img :src="item.thumb" alt="" class="goodsImg">
                                 <div class="goods-info">
-                                    <span>爱情.玫瑰花</span>
-                                    <span style="color: #0C0C0C;font-weight: bold">￥ 99</span>
-                                    <span>已售出1.9万件</span>
+                                    <span>{{item.title}}</span>
+                                    <span>{{item.subtitle}}</span>
+                                    <span style="color: #0C0C0C;font-weight: bold">￥ {{item.price}}</span>
+                                    <span>库存剩{{item.stock}}件</span>
+                                    <span>已售出{{item.sell_num}}件</span>
                                 </div>
                             </div>
                         </div>
@@ -558,22 +560,26 @@ AppAsset::register($this);
                         'http://img.chinait.com/2019/03/46-2.png',
                         'http://5b0988e595225.cdn.sohucs.com/images/20180103/d78d9fd7150543cbb5821a3c3b008294.jpeg'
                     ],
-                    goodsImgs: [
-                        'https://img0.utuku.china.com/630x0/hyzx/20180706/7e91f834-91a9-41b8-8b0d-0765e681fe79.png',
-                        'https://img01.hua.com/uploadpic/newpic/9010011.jpg_220x240.jpg',
-                        'https://img01.hua.com/uploadpic/newpic/9012154.jpg_220x240.jpg',
-                        'https://img01.hua.com/uploadpic/newpic/9010966.jpg_220x240.jpg',
-                        'https://img01.hua.com/uploadpic/newpic/9012243.jpg_220x240.jpg',
-                        'https://img0.utuku.china.com/630x0/hyzx/20180706/7e91f834-91a9-41b8-8b0d-0765e681fe79.png',
-                        'https://img01.hua.com/uploadpic/newpic/9012228.jpg_220x240.jpg',
-                        'http://5b0988e595225.cdn.sohucs.com/images/20180103/d78d9fd7150543cbb5821a3c3b008294.jpeg'
-                    ],
+                    goodsList: []
                 };
             },
             created: function(){
                 this.getUserInfo()
+                this.getGoodsList()
             },
             methods: {
+                getGoodsList(){
+                    let url = '<?php echo \yii\helpers\Url::toRoute('goods/goods-list');?>';
+                    axios.post(url)
+                        .then(response => {
+                            const resp = response.data;
+                            console.log('获取商品列表结果', resp);
+                            this.goodsList = resp.result.list
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        });
+                },
                 handleAvatarSuccess(res, file) {
                     console.log('handleAvatarSuccess', res, file)
                     this.user.avatar = URL.createObjectURL(file.raw);

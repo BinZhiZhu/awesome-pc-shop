@@ -252,7 +252,7 @@ class GoodsController extends Controller
                 ]
             ]);
         }
-        
+
         $goods->created_by = $user_id;
         $goods->updated_at = time();
         $goods->title = $title;
@@ -283,5 +283,36 @@ class GoodsController extends Controller
 
     }
 
+
+    /**
+     * 获取所有商品列表
+     *
+     * @return object
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function actionGoodsList()
+    {
+        //查找发布的所有商品
+        $goods = GoodsEntity::find()
+            ->where([
+                'status' => StatusTypeEnum::ON,
+                'is_deleted' => StatusTypeEnum::OFF
+            ])
+            ->orderBy(['id' => SORT_DESC])
+            ->asArray()
+            ->all();
+
+        return Yii::createObject([
+            'class' => 'yii\web\Response',
+            'format' => \yii\web\Response::FORMAT_JSON,
+            'data' => [
+                'code' => 200,
+                'result' => [
+                    'list' => $goods,
+                    'total' => count($goods)
+                ]
+            ]
+        ]);
+    }
 
 }
