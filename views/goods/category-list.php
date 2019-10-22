@@ -359,11 +359,7 @@ AppAsset::register($this);
                         const resp = response.data;
                         console.log('success', resp);
                         this.getCategoryList()
-                        if (resp.code === 200) {
-                            this.alertMessage(resp.message, true, 'success')
-                        } else {
-                            this.alertMessage(resp.message, true, 'error')
-                        }
+                        this.alertMessage(resp.message,true,resp.code === 200 ? 'success': 'error')
                     })
                     .catch(error => {
                         console.log(error)

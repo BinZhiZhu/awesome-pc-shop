@@ -456,7 +456,7 @@ AppAsset::register($this);
             },
             handleDelete(index, row) {
                 console.log(index, row);
-                let url = '<?php echo \yii\helpers\Url::toRoute('backend/delete-user');?>';
+                let url = '<?php echo \yii\helpers\Url::toRoute('goods/delete-goods');?>';
                 let param = new URLSearchParams();
                 const postdata = {
                     id: row.id

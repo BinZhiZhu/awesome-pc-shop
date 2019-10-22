@@ -589,7 +589,7 @@ class GoodsController extends Controller
             'class' => 'yii\web\Response',
             'format' => \yii\web\Response::FORMAT_JSON,
             'data' => [
-                'code' => -200,
+                'code' => 200,
                 'message' => '删除成功',
                 'result' => []
             ]
@@ -597,4 +597,45 @@ class GoodsController extends Controller
     }
 
 
+    /**
+     * 删除商品
+     *
+     * @return object
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function actionDeleteGoods()
+    {
+        $goods_id = Yii::$app->request->post('id');
+
+        $goods_id = intval($goods_id);
+
+        $goods = GoodsEntity::findOne([
+            'id' => $goods_id
+        ]);
+
+        if (!$goods) {
+            return Yii::createObject([
+                'class' => 'yii\web\Response',
+                'format' => \yii\web\Response::FORMAT_JSON,
+                'data' => [
+                    'code' => -200,
+                    'message' => '商品不存在',
+                    'result' => []
+                ]
+            ]);
+        }
+
+        $goods->is_deleted = StatusTypeEnum::ON;
+        $goods->save(false);
+
+        return Yii::createObject([
+            'class' => 'yii\web\Response',
+            'format' => \yii\web\Response::FORMAT_JSON,
+            'data' => [
+                'code' => 200,
+                'message' => '删除成功',
+                'result' => []
+            ]
+        ]);
+    }
 }

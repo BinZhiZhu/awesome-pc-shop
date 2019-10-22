@@ -479,7 +479,7 @@ AppAsset::register($this);
                     email: this.user.email,
                     mobile: this.user.mobile,
                     address: this.user.address,
-                    avatar: this.realAvatar
+                    avatar: this.realAvatar ? this.realAvatar : this.user.avatar
                 };
                 let param = new URLSearchParams();
                 param.append('gender', postData.gender);
