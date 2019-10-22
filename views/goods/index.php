@@ -200,7 +200,7 @@ AppAsset::register($this);
                                 if(response.data.code === 200){
                                     const resp = response.data.result;
                                     this.$notify({
-                                        title: response.message,
+                                        title: response.data.message,
                                         message: '快去商品列表查看吧',
                                         type: 'success',
                                     });

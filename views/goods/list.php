@@ -68,6 +68,31 @@ AppAsset::register($this);
     .el-dialog{
         margin-top: 10px !important;
     }
+    .avatar-uploader .el-upload {
+        width: 178px;
+        height: 178px;
+        border: 1px dashed #d9d9d9;
+        border-radius: 6px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+    .avatar-uploader .el-upload:hover {
+        border-color: #409EFF;
+    }
+    .avatar-uploader-icon {
+        font-size: 28px;
+        color: #8c939d;
+        width: 178px;
+        height: 178px;
+        line-height: 178px;
+        text-align: center;
+    }
+    .avatar {
+        width: 178px;
+        height: 178px
+        display: block;
+    }
 </style>
 <?php $this->beginBody() ?>
 <div id="app">
@@ -92,53 +117,57 @@ AppAsset::register($this);
                 <template slot-scope="scope">{{scope.row.id}}</template>
             </el-table-column>
             <el-table-column
-                    label="用户名"
-                    align="center"
-                    width="150">
-                <template slot-scope="scope">{{scope.row.username}}</template>
-            </el-table-column>
-            <el-table-column
-                    label="用户角色"
-                    align="center"
-                    width="100">
-                <template slot-scope="scope">{{scope.row.role_name}}</template>
-            </el-table-column>
-            <el-table-column
-                    label="登录次数"
-                    align="center"
-                    width="100">
-                <template slot-scope="scope">{{scope.row.login_count}}</template>
-            </el-table-column>
-            <el-table-column
-                    label="域名信息"
+                    label="标题"
                     align="center"
                     width="180">
-                <template slot-scope="scope">{{scope.row.host_info}}</template>
+                <template slot-scope="scope">{{scope.row.title}}</template>
             </el-table-column>
             <el-table-column
-                    label="注册日期"
+                    label="副标题"
+                    align="center"
+                    width="180">
+                <template slot-scope="scope">{{scope.row.subtitle}}</template>
+            </el-table-column>
+            <el-table-column
+                    label="缩略图"
+                    align="center"
+                    width="120">
+                <template slot-scope="scope">
+                    <el-image
+                            style="width: 120px; height: 120px"
+                            :src="scope.row.thumb"
+                           ></el-image>
+                </template>
+            </el-table-column>
+            <el-table-column
+                    label="价格"
+                    align="center"
+                    width="100">
+                <template slot-scope="scope">
+                    <span style="margin-left: 10px">{{ scope.row.price }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                    label="库存"
+                    align="center"
+                    width="100">
+                <template slot-scope="scope">{{scope.row.stock}}</template>
+            </el-table-column>
+            <el-table-column
+                    label="已售数量"
+                    align="center"
+                    width="100">
+                <template slot-scope="scope">{{scope.row.sell_num}}</template>
+            </el-table-column>
+            <el-table-column
+                    label="发布时间"
                     align="center"
                     width="180">
                 <template slot-scope="scope">
                     <i class="el-icon-time"></i>
-                    <span style="margin-left: 10px">{{ scope.row.register_time }}</span>
+                    <span style="margin-left: 10px">{{ scope.row.created_at }}</span>
                 </template>
             </el-table-column>
-            <el-table-column
-                    label="最近登录时间"
-                    align="center"
-                    width="180">
-                <template slot-scope="scope">
-                    <i class="el-icon-time"></i>
-                    <span style="margin-left: 10px">{{ scope.row.lastvisit_time }}</span>
-                </template>
-            </el-table-column>
-<!--            <el-table-column-->
-<!--                    label="上一次访问IP"-->
-<!--                    align="center"-->
-<!--                    width="120">-->
-<!--                <template slot-scope="scope">{{scope.row.lastvisit_ip}}</template>-->
-<!--            </el-table-column>-->
             <el-table-column
                     label="操作"
                     align="center"
@@ -146,7 +175,7 @@ AppAsset::register($this);
                 <template slot-scope="scope">
                     <el-button
                             size="mini"
-                            @click="handleEdit(scope.$index, scope.row)">查看</el-button>
+                            @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
                     <el-button
                             size="mini"
                             type="danger"
@@ -154,37 +183,46 @@ AppAsset::register($this);
                 </template>
             </el-table-column>
         </el-table>
-        <el-dialog
-                title="用户信息"
-                :visible.sync="dialogUserInfoVisible"
-                width="32%"
-                center
-                :before-close="handleClose"
-        >
-            <el-form :model="userForm" :rules="userRules" ref="userForm">
-                <el-form-item label="编号" :label-width="formLabelWidth" prop="username">
-                    <el-input v-model="user.id" disabled></el-input>
+        <el-drawer
+                title="商品信息"
+                size="50%"
+                :visible.sync="drawer"
+                :direction="direction"
+                >
+            <el-form :label-position="labelPosition" label-width="100px"  :model="ruleForm" :rules="rules" ref="ruleForm">
+                <el-form-item label="商品标题" prop="title">
+                    <el-input v-model="ruleForm.title"></el-input>
+                </el-form-item>
+                <el-form-item label="商品副标题" prop="subtitle">
+                    <el-input v-model="ruleForm.subtitle"></el-input>
+                </el-form-item>
+                <el-form-item label="商品价格" prop="price">
+                    <el-input v-model="ruleForm.price"></el-input>
+                </el-form-item>
+                <el-form-item label="商品图片" prop="thumb">
+                    <el-upload
+                            class="avatar-uploader"
+                            action="https://jsonplaceholder.typicode.com/posts/"
+                            :show-file-list="false"
+                            :on-success="handleAvatarSuccess"
+                            :before-upload="beforeAvatarUpload">
+                        <img v-if="ruleForm.thumb" :src="ruleForm.thumb" class="thumb">
+                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                    </el-upload>
+                </el-form-item>
+                <el-form-item label="商品库存" prop="stock">
+                    <el-input v-model="ruleForm.stock"></el-input>
+                </el-form-item>
+                <el-form-item label="已售数量" >
+                    <el-input v-model="ruleForm.sell_num"></el-input>
+                </el-form-item>
+                <el-form-item align="center">
+                    <el-button type="primary" @click="submitForm('ruleForm')">保存商品</el-button>
+                    <el-button @click="resetForm('ruleForm')">重置</el-button>
                 </el-form-item>
             </el-form>
-            <el-form :model="userForm" :rules="userRules" ref="userForm">
-                <el-form-item label="账号" :label-width="formLabelWidth" prop="username">
-                    <el-input v-model="user.username" disabled></el-input>
-                </el-form-item>
-            </el-form>
-            <el-form :model="userForm" :rules="userRules" ref="userForm">
-                <el-form-item label="角色" :label-width="formLabelWidth" prop="role">
-                    <el-input v-model="user.role_name" disabled></el-input>
-                </el-form-item>
-            </el-form>
-            <el-form :model="userForm" :rules="userRules" ref="userForm">
-                <el-form-item label="登录次数" :label-width="formLabelWidth" prop="role">
-                    <el-input v-model="user.login_count" disabled></el-input>
-                </el-form-item>
-            </el-form>
-            <span slot="footer" class="dialog-footer">
-                    <el-button type="primary" @click="handleClose">关闭</el-button>
-            </span>
-        </el-dialog>
+        </el-drawer>
+
     </template>
     <div class="block">
         <el-pagination
@@ -228,50 +266,55 @@ AppAsset::register($this);
             return {
                 page:1,
                 total:"",
-                dialogUserInfoVisible: false,
+                drawer: false,
+                direction: 'rtl',
                 formLabelWidth: '120px',
-                user: {},
-                userForm: {
-                    email: '',
-                    address: '',
-                    mobile: '',
-                    gender: '',
-                },
-                //校验规则
-                userRules: {
-                    mobile: [
-                        {
-                            validator: validateMobile,
-                            trigger: 'blur'
-                        }
-                    ],
-                    email: [
-                        {
-                            validator: validateEmail,
-                            trigger: 'blur'
-                        }
-                    ]
-                },
+                goods: {},
                 tableData: [
                     {
                         id: 0,
-                        lastvisit_ip: "",
-                        lastvisit_time: "",
-                        login_count: "4",
-                        password: "",
-                        register_ip: "",
-                        register_time: "",
-                        role: "",
-                        salt: "",
-                        status: "",
-                        username: "",
+                        created_at: "",
+                        title:'',
+                        subtitle:'',
+                        price:0,
+                        stock:0,
+                        sell_num: 0,
+                        thumb:'',
                     }
-                ]
+                ],
+                goods_id: 0,
+                ruleForm: {
+                    title: '',
+                    subtitle: '',
+                    stock: 0,
+                    sell_num: 0,
+                    price: 0,
+                    thumb: '',
+                },
+                imageUrl: '',
+                rules: {
+                    title: [
+                        { required: true, message: '请输入商品标题', trigger: 'blur' },
+                    ],
+                    subtitle: [
+                        { required: true, message: '请输入商品副标题', trigger: 'blur' },
+                    ],
+                    price: [
+                        { required: true, message: '请输入商品价格', trigger: 'blur' },
+                    ],
+                    thumb: [
+                        { required: true, message: '请上传商品图片', trigger: 'blur' },
+                    ],
+                    stock: [
+                        { required: true, message: '请设置商品库存', trigger: 'blur' },
+                    ],
+                },
+                labelPosition: 'right',
             };
         },
         created: function () {
             // `this` 指向 vm 实例
-            let url = '<?php echo \yii\helpers\Url::toRoute('backend/get-user-list');?>';
+            let url = '<?php echo \yii\helpers\Url::toRoute('goods/get-goods-list');?>';
             axios.post(url)
                 .then(response => {
                     const resp = response.data;
@@ -284,6 +327,37 @@ AppAsset::register($this);
                 });
         },
         methods: {
+            handleAvatarSuccess(res, file) {
+                console.log('handleAvatarSuccess', res, file)
+                this.ruleForm.thumb = URL.createObjectURL(file.raw);
+                console.log('imageUrl', this.ruleForm.ruleForm)
+                //生成了blob文件
+                let url = '<?php echo \yii\helpers\Url::toRoute('pc/upload');?>';
+                const data = new FormData();
+                data.append('file',file.raw);
+                axios.post(url,data)
+                    .then(response => {
+                        console.log('获取图片上传结果', response.data);
+                        const resp = response.data.result;
+                        this.imageUrl = resp.url
+                    })
+                    .catch(error => {
+                        console.log(error)
+                    });
+            },
+            beforeAvatarUpload(file) {
+                console.log('beforeAvatarUpload',file)
+                const isJPG = file.type === 'image/jpeg';
+                const isLt2M = file.size / 1024 / 1024 < 2;
+
+                if (!isJPG) {
+                    this.$message.error('上传头像图片只能是 JPG 格式!');
+                }
+                if (!isLt2M) {
+                    this.$message.error('上传头像图片大小不能超过 2MB!');
+                }
+                return isJPG && isLt2M;
+            },
             handleClose(done) {
                 this.dialogUserInfoVisible = false
             },
@@ -333,42 +407,48 @@ AppAsset::register($this);
             },
             handleEdit(index, row) {
                 console.log(index, row);
-                this.dialogUserInfoVisible = true
-                this.user = row
+                this.drawer = true
+                this.ruleForm = row
+                this.goods_id = row.id
             },
-            //提交用户信息表单
-            submitUserForm(formName) {
-                console.log('submitUserForm',formName)
-                let url = '<?php echo \yii\helpers\Url::toRoute('pc/edit-user-info');?>';
-                const postData = {
-                    gender:this.user.gender,
-                    email: this.user.email,
-                    mobile: this.user.mobile,
-                    address: this.user.address,
-                    avatar: this.realAvatar
-                };
-                let param = new URLSearchParams();
-                param.append('gender', postData.gender);
-                param.append('email', postData.email);
-                param.append('mobile', postData.mobile);
-                param.append('address', postData.address);
-                param.append('avatar', postData.avatar);
-                param.append('user_id', this.user.id);
-                console.log('保存用户信息提交过去的参数', postData)
-                axios.post(url, param)
-                    .then(response => {
-                        console.log('保存用户信息成功', response);
-                        if (response.data.code === 200) {
-                            this.saveInfoSuccess()
-                            this.dialogUserInfoVisible = false
-                            this.getUserInfo()
-                        }else {
-                            this.alertMessage(response.data.message, true, 'error');
-                        }
-                    })
-                    .catch(error => {
-                        console.log(error)
-                    });
+            submitForm(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        const postData = this.ruleForm
+                        postData.thumb = this.imageUrl
+                        console.log('postData',postData)
+                        let url = '<?php echo \yii\helpers\Url::toRoute('goods/edit');?>';
+                        let param = new URLSearchParams();
+                        param.append('title',postData.title);
+                        param.append('subtitle',postData.subtitle);
+                        param.append('price',postData.price);
+                        param.append('stock',postData.stock);
+                        param.append('sell_num',postData.sell_num);
+                        param.append('thumb',postData.thumb);
+                        param.append('goods_id',this.goods_id);
+                        axios.post(url,param)
+                            .then(response => {
+                                console.log('获取编辑商品结果', response.data);
+                                if(response.data.code === 200){
+                                    const resp = response.data.result;
+                                    this.$notify({
+                                        title: response.data.message,
+                                        message: '',
+                                        type: 'success',
+                                    });
+                                    this.drawer = false
+                                }else {
+                                    this.alertMessage(response.data.message, true, 'error');
+                                }
+                            })
+                            .catch(error => {
+                                console.log(error)
+                            });
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
             },
             //重置表单 移除校验结果
             resetForm(formName) {
