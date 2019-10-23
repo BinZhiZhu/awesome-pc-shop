@@ -352,13 +352,22 @@ class GoodsController extends Controller
      */
     public function actionGoodsList()
     {
+        $category_id = Yii::$app->request->post('category_id');
+        $category_id = intval($category_id);
+
         //查找发布的所有商品
-        $goods = GoodsEntity::find()
+        $query = GoodsEntity::find()
             ->where([
                 'status' => StatusTypeEnum::ON,
                 'is_deleted' => StatusTypeEnum::OFF
-            ])
-            ->orderBy(['id' => SORT_DESC])
+            ]);
+
+        //带分类搜索
+        if ($category_id) {
+            $query->andWhere(['category_id' => $category_id]);
+        }
+        
+        $goods = $query->orderBy(['id' => SORT_DESC])
             ->asArray()
             ->all();
 
@@ -635,6 +644,37 @@ class GoodsController extends Controller
                 'code' => 200,
                 'message' => '删除成功',
                 'result' => []
+            ]
+        ]);
+    }
+
+    /**
+     * 获取商品分类列表
+     *
+     * @return object
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function actionGetGoodsCategoryList()
+    {
+        $categorys = GoodsCategoryEntity::find()
+            ->where([
+                'status' => StatusTypeEnum::ON,
+                'is_deleted' => StatusTypeEnum::OFF
+            ])
+            ->orderBy(['id' => SORT_DESC])
+            ->limit(12)
+            ->asArray()
+            ->all();
+
+        return Yii::createObject([
+            'class' => 'yii\web\Response',
+            'format' => \yii\web\Response::FORMAT_JSON,
+            'data' => [
+                'code' => 200,
+                'result' => [
+                    'list' => $categorys,
+                    'total' => count($categorys)
+                ]
             ]
         ]);
     }

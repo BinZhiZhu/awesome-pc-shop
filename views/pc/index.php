@@ -200,6 +200,13 @@ AppAsset::register($this);
         .user-button{
 
         }
+        .empty-goods{
+            display: flex;
+            flex-direction: row;
+        }
+        .empty-goods-text{
+            padding-left: 500px;
+        }
     </style>
     <div id="app">
         <!--    首页容器布局-->
@@ -360,45 +367,12 @@ AppAsset::register($this);
                 <el-aside width="200px">
                     <el-menu :default-openeds="['1', '3']">
                         <el-submenu index="1">
-                            <template slot="title"><i class="el-icon-message"></i>商品分类一</template>
-                            <el-menu-item-group>
-                                <template slot="title">分组一</template>
-                                <el-menu-item index="1-1">玫瑰花</el-menu-item>
-                                <el-menu-item index="1-2">百合</el-menu-item>
-                            </el-menu-item-group>
-                            <el-menu-item-group title="分组2">
-                                <el-menu-item index="1-3">紫荆花</el-menu-item>
-                            </el-menu-item-group>
-                        </el-submenu>
-                        <el-submenu index="2">
-                            <template slot="title"><i class="el-icon-menu"></i>商品分类二</template>
-                            <el-menu-item-group>
-                                <template slot="title">分组一</template>
-                                <el-menu-item index="2-1">玫瑰花</el-menu-item>
-                                <el-menu-item index="2-2">百合</el-menu-item>
-                            </el-menu-item-group>
-                            <el-menu-item-group title="分组2">
-                                <el-menu-item index="2-3">紫荆花</el-menu-item>
-                            </el-menu-item-group>
-                            <el-submenu index="2-4">
-                                <template slot="title">选项4</template>
-                                <el-menu-item index="2-4-1">桃花</el-menu-item>
-                            </el-submenu>
-                        </el-submenu>
-                        <el-submenu index="3">
-                            <template slot="title"><i class="el-icon-setting"></i>商品分类三</template>
-                            <el-menu-item-group>
-                                <template slot="title">分组一</template>
-                                <el-menu-item index="3-1">玫瑰花</el-menu-item>
-                                <el-menu-item index="3-2">百合花</el-menu-item>
-                            </el-menu-item-group>
-                            <el-menu-item-group title="分组2">
-                                <el-menu-item index="3-3">紫荆花</el-menu-item>
-                            </el-menu-item-group>
-                            <el-submenu index="3-4">
-                                <template slot="title">选项4</template>
-                                <el-menu-item index="3-4-1">选项4-1</el-menu-item>
-                            </el-submenu>
+                            <template slot="title"><i class="el-icon-goods"></i>商品分类</template>
+                            <template v-for="category in goodsCategoryList" :key="category">
+<!--                                <el-menu-item-group>-->
+                                <el-menu-item :index="category.id" @click="clickCategory(category)">{{category.title}}</el-menu-item>
+<!--                                </el-menu-item-group>-->
+                            </template>
                         </el-submenu>
                     </el-menu>
                 </el-aside>
@@ -414,7 +388,7 @@ AppAsset::register($this);
                         </template>
                         <!-- 商品图片-->
                         <div class="goods-balance">
-                            <div class="goods-balance__item" v-for="item in goodsList">
+                            <div class="goods-balance__item" v-for="item in goodsList" v-if="goodsList.length>0">
                                 <img :src="item.thumb" alt="" class="goodsImg">
                                 <div class="goods-info">
                                     <span>{{item.title}}</span>
@@ -423,6 +397,9 @@ AppAsset::register($this);
                                     <span>库存剩{{item.stock}}件</span>
                                     <span>已售出{{item.sell_num}}件</span>
                                 </div>
+                            </div>
+                            <div v-if="goodsList.length<=0" class="empty-goods">
+                                <el-button type="text" class="empty-goods-text">很抱歉，暂无商品信息哦~</el-button>
                             </div>
                         </div>
                     </el-main>
@@ -560,14 +537,32 @@ AppAsset::register($this);
                         'http://img.chinait.com/2019/03/46-2.png',
                         'http://5b0988e595225.cdn.sohucs.com/images/20180103/d78d9fd7150543cbb5821a3c3b008294.jpeg'
                     ],
-                    goodsList: []
+                    goodsList: [],
+                    goodsCategoryList: []
                 };
             },
             created: function(){
                 this.getUserInfo()
                 this.getGoodsList()
+                this.getGoodsCategoryList()
             },
             methods: {
+                //点击分类
+                clickCategory(e){
+                    console.log('点击分类',e)
+                    let url = '<?php echo \yii\helpers\Url::toRoute('goods/goods-list');?>';
+                    let param = new URLSearchParams();
+                    param.append('category_id',e.id);
+                    axios.post(url,param)
+                        .then(response => {
+                            const resp = response.data;
+                            console.log('获取分类筛选商品列表结果', resp);
+                            this.goodsList = resp.result.list
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        });
+                },
                 getGoodsList(){
                     let url = '<?php echo \yii\helpers\Url::toRoute('goods/goods-list');?>';
                     axios.post(url)
@@ -575,6 +570,18 @@ AppAsset::register($this);
                             const resp = response.data;
                             console.log('获取商品列表结果', resp);
                             this.goodsList = resp.result.list
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        });
+                },
+                getGoodsCategoryList(){
+                    let url = '<?php echo \yii\helpers\Url::toRoute('goods/get-goods-category-list');?>';
+                    axios.post(url)
+                        .then(response => {
+                            const resp = response.data;
+                            console.log('获取商品分类列表结果', resp);
+                            this.goodsCategoryList = resp.result.list
                         })
                         .catch(error => {
                             console.log(error)

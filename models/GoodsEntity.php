@@ -19,6 +19,7 @@ use Yii;
  * @property int status 状态
  * @property int is_deleted 是否删除
  * @property int updated_at
+ * @property int category_id 分类ID
  */
 class GoodsEntity extends \yii\db\ActiveRecord
 {
@@ -36,7 +37,7 @@ class GoodsEntity extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['stock', 'sell_num', 'created_at', 'created_by', 'status', 'is_deleted', 'updated_at'], 'integer'],
+            [['stock', 'sell_num', 'created_at', 'created_by', 'status', 'is_deleted', 'updated_at', 'category_id'], 'integer'],
             [['price'], 'number'],
             [['title', 'subtitle', 'thumb'], 'string', 'max' => 255],
         ];
@@ -59,7 +60,8 @@ class GoodsEntity extends \yii\db\ActiveRecord
             'created_by' => 'Created By',
             'status' => 'status',
             'is_deleted' => 'is_deleted',
-            'updated_at' => 'updated_at'
+            'updated_at' => 'updated_at',
+            'category_id' => 'category_id'
         ];
     }
 }
