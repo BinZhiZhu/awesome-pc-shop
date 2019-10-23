@@ -6,6 +6,8 @@ use yii\helpers\Html;
 
 ElementUI::register($this);
 AppAsset::register($this);
+$this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 'renderToolbar']);
+
 ?>
 <?php $this->beginPage() ?>
     <!DOCTYPE html>
@@ -240,10 +242,10 @@ AppAsset::register($this);
                                     class="search-input"
                                     placeholder="请输入商品名称"
                                     prefix-icon="el-icon-search"
-                                    v-model="input2"
+                                    v-model="search_title"
                             >
                             </el-input>
-                            <el-button type="primary" class="search-button">搜索</el-button>
+                            <el-button type="primary" class="search-button" @click="searchGoods()">搜索</el-button>
                         </div>
                         <div class="link-balance__right">
                             <div class="user-avatar">
@@ -388,7 +390,7 @@ AppAsset::register($this);
                         </template>
                         <!-- 商品图片-->
                         <div class="goods-balance">
-                            <div class="goods-balance__item" v-for="item in goodsList" v-if="goodsList.length>0">
+                            <div class="goods-balance__item" v-for="item in goodsList" v-if="goodsList.length>0" @click="getGoodsDetail(item)">
                                 <img :src="item.thumb" alt="" class="goodsImg">
                                 <div class="goods-info">
                                     <span>{{item.title}}</span>
@@ -402,6 +404,22 @@ AppAsset::register($this);
                                 <el-button type="text" class="empty-goods-text">很抱歉，暂无商品信息哦~</el-button>
                             </div>
                         </div>
+                        <el-dialog
+                                title="商品信息"
+                                :visible.sync="centerDialogVisible"
+                                width="30%"
+                                center>
+                                <div>商品标题:     {{chooseGoods.title}}</div>
+                                <div>商品副标题:    {{chooseGoods.subtitle}}</div>
+                                <div>商品分类:    {{chooseGoods.category_title}}</div>
+                                <div>商品价格:    <span style="color: red">￥{{chooseGoods.price}}</span></div>
+                                <div>商品库存:    {{chooseGoods.stock}}</div>
+                                <div>商品已售数量:    {{chooseGoods.sell_num}}</div>
+                            <span slot="footer" class="dialog-footer">
+                           <el-button type="primary" @click="addToCart(chooseGoods.id)">加入购物车</el-button>
+                          <el-button type="primary" @click="buyNow(chooseGoods.id)">立即购买</el-button>
+                 </span>
+                        </el-dialog>
                     </el-main>
                     <el-footer>
                         花礼网 （中国鲜花礼品网） xxxxx版权 中国鲜花网领先品牌，鲜花速递专家！
@@ -466,6 +484,7 @@ AppAsset::register($this);
                     is_login: false,
                     realAvatar: '',
                     user: {},
+                    chooseGoods: {},
                     options: [
                         {
                             value: 0,
@@ -478,10 +497,11 @@ AppAsset::register($this);
                     ],
                     imageUrl: '',
                     dialogVisible: false,
+                    centerDialogVisible: false,
                     dialogRegisterVisible: false,
                     dialogLoginVisible: false,
                     dialogUserInfoVisible: false,
-                    input2: '',
+                    search_title: '',
                     formLabelWidth: '120px',
                     form: {
                         username: '',
@@ -547,6 +567,19 @@ AppAsset::register($this);
                 this.getGoodsCategoryList()
             },
             methods: {
+                addToCart(id){
+                    this.$message.success('加入成功');
+                    this.centerDialogVisible = false
+                },
+                buyNow(id){
+                    this.$message.success('购买成功');
+                    this.centerDialogVisible = false
+                },
+                getGoodsDetail(item){
+                    console.log('查看商品详情',item)
+                    this.centerDialogVisible = true
+                    this.chooseGoods = item
+                },
                 //点击分类
                 clickCategory(e){
                     console.log('点击分类',e)
@@ -557,6 +590,21 @@ AppAsset::register($this);
                         .then(response => {
                             const resp = response.data;
                             console.log('获取分类筛选商品列表结果', resp);
+                            this.goodsList = resp.result.list
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        });
+                },
+                //商品搜索
+                searchGoods(){
+                    let url = '<?php echo \yii\helpers\Url::toRoute('goods/goods-list');?>';
+                    let param = new URLSearchParams();
+                    param.append('title',this.search_title);
+                    axios.post(url,param)
+                        .then(response => {
+                            const resp = response.data;
+                            console.log('获取标题筛选商品列表结果', resp);
                             this.goodsList = resp.result.list
                         })
                         .catch(error => {

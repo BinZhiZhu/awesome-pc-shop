@@ -10,6 +10,8 @@ use app\assets\ElementUI;
 
 ElementUI::register($this);
 AppAsset::register($this);
+$this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 'renderToolbar']);
+
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -73,6 +75,16 @@ AppAsset::register($this);
         <el-form-item label="商品副标题" prop="subtitle">
             <el-input v-model="ruleForm.subtitle"></el-input>
         </el-form-item>
+        <el-form-item label="商品分类" prop="category">
+        <el-select v-model="ruleForm.category" placeholder="请选择">
+            <el-option
+                    v-for="item in goodsCategoryList"
+                    :key="item.id"
+                    :label="item.title"
+                    :value="item.id">
+            </el-option>
+        </el-select>
+        </el-form-item>
         <el-form-item label="商品价格" prop="price">
             <el-input v-model="ruleForm.price"></el-input>
         </el-form-item>
@@ -112,13 +124,15 @@ AppAsset::register($this);
         router,
         data() {
             return {
+                goodsCategoryList: [],
                 ruleForm: {
                     title: '',
                     subtitle: '',
                     stock: 0,
                     sell_num: 0,
                     price: 0,
-                    thumb: ''
+                    thumb: '',
+                    category: '',
                 },
                 imageUrl: '',
                 rules: {
@@ -137,11 +151,30 @@ AppAsset::register($this);
                     stock: [
                         { required: true, message: '请设置商品库存', trigger: 'blur' },
                     ],
+                    category: [
+                        { required: true, message: '请选择商品分类', trigger: 'blur' },
+                    ],
                 },
                 labelPosition: 'right',
             }
         },
+        created: function(){
+            this.getGoodsCategoryList()
+        },
         methods: {
+            //获取商品分类
+            getGoodsCategoryList(){
+                let url = '<?php echo \yii\helpers\Url::toRoute('goods/get-goods-category-list');?>';
+                axios.post(url)
+                    .then(response => {
+                        const resp = response.data;
+                        console.log('获取商品分类列表结果', resp);
+                        this.goodsCategoryList = resp.result.list
+                    })
+                    .catch(error => {
+                        console.log(error)
+                    });
+            },
             handleAvatarSuccess(res, file) {
                 console.log('handleAvatarSuccess', res, file)
                 this.ruleForm.thumb = URL.createObjectURL(file.raw);
@@ -192,6 +225,7 @@ AppAsset::register($this);
                         param.append('subtitle',postData.subtitle);
                         param.append('price',postData.price);
                         param.append('stock',postData.stock);
+                        param.append('category',postData.category);
                         param.append('sell_num',postData.sell_num);
                         param.append('thumb',postData.thumb);
                         axios.post(url,param)

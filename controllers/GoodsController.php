@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\enums\RoleTypeEnum;
 use app\enums\StatusTypeEnum;
+use app\libs\Tools;
 use app\models\DevUsers;
 use app\models\GoodsCategoryEntity;
 use app\models\GoodsEntity;
@@ -68,6 +69,10 @@ class GoodsController extends Controller
 
         foreach ($goods as &$good) {
             $good['created_at'] = date("Y:m:d H:i", $good['created_at']);
+            $category = GoodsCategoryEntity::findOne([
+                'id' => $good['category_id']
+            ]);
+            $good['category_title'] = $category ? $category->title : '';
         }
 
         unset($good);
@@ -148,6 +153,7 @@ class GoodsController extends Controller
         $stock = Yii::$app->request->post('stock');
         $sell_num = Yii::$app->request->post('sell_num');
         $thumb = Yii::$app->request->post('thumb');
+        $category = Yii::$app->request->post('category');
 
         $session = Yii::$app->session;
 
@@ -163,6 +169,7 @@ class GoodsController extends Controller
         $sell_num = intval($sell_num);
         $thumb = trim($thumb);
         $user_id = intval($user_id);
+        $category = intval($category);
 
         //商家才能发布商品
         $user = DevUsers::findOne([
@@ -201,6 +208,7 @@ class GoodsController extends Controller
         $model->subtitle = $subtitle;
         $model->price = $price;
         $model->stock = $stock;
+        $model->category_id = $category;
         $model->sell_num = $sell_num;
         $model->thumb = $thumb;
         $model->status = StatusTypeEnum::ON;
@@ -239,6 +247,7 @@ class GoodsController extends Controller
         $sell_num = Yii::$app->request->post('sell_num');
         $thumb = Yii::$app->request->post('thumb');
         $goods_id = Yii::$app->request->post('goods_id');
+        $category = Yii::$app->request->post('category');
 
         $session = Yii::$app->session;
 
@@ -254,6 +263,7 @@ class GoodsController extends Controller
         $thumb = trim($thumb);
         $user_id = intval($user_id);
         $goods_id = intval($goods_id);
+        $category = intval($category);
 
         //商家才能发布商品
         $user = DevUsers::findOne([
@@ -319,6 +329,7 @@ class GoodsController extends Controller
         $goods->subtitle = $subtitle;
         $goods->price = $price;
         $goods->stock = $stock;
+        $goods->category_id = $category;
         $goods->sell_num = $sell_num;
         $goods->thumb = $thumb;
         $goods->status = StatusTypeEnum::ON;
@@ -353,7 +364,14 @@ class GoodsController extends Controller
     public function actionGoodsList()
     {
         $category_id = Yii::$app->request->post('category_id');
-        $category_id = intval($category_id);
+        if ($category_id) {
+            $category_id = intval($category_id);
+        }
+
+        $search_title = Yii::$app->request->post('title');
+        if ($search_title) {
+            $search_title = trim($search_title);
+        }
 
         //查找发布的所有商品
         $query = GoodsEntity::find()
@@ -366,10 +384,21 @@ class GoodsController extends Controller
         if ($category_id) {
             $query->andWhere(['category_id' => $category_id]);
         }
-        
+
+        if ($search_title) {
+            $query->andWhere(['LIKE', 'title', $search_title]);
+        }
+
         $goods = $query->orderBy(['id' => SORT_DESC])
             ->asArray()
             ->all();
+
+        foreach ($goods as &$good) {
+            $category = GoodsCategoryEntity::findOne(['id' => $good['category_id']]);
+            $good['category_title'] = $category ? $category->title : '';
+        }
+
+        unset($good);
 
         return Yii::createObject([
             'class' => 'yii\web\Response',

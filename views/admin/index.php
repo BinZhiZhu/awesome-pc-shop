@@ -6,7 +6,7 @@ use yii\helpers\Html;
 \app\assets\Layui::register($this);
 AppAsset::register($this);
 ElementUI::register($this);
-
+$this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 'renderToolbar']);
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
