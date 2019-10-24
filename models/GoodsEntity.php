@@ -20,6 +20,7 @@ use Yii;
  * @property int is_deleted 是否删除
  * @property int updated_at
  * @property int category_id 分类ID
+ * @property DevUsers memberEntity
  */
 class GoodsEntity extends \yii\db\ActiveRecord
 {
@@ -63,5 +64,13 @@ class GoodsEntity extends \yii\db\ActiveRecord
             'updated_at' => 'updated_at',
             'category_id' => 'category_id'
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMemberEntity()
+    {
+        return $this->hasOne(DevUsers::className(),['id'=>'created_by']);
     }
 }

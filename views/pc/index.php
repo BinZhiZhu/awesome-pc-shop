@@ -263,7 +263,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                                 <el-button type="text" @click="loginUser" v-if="!is_login">您好，请登录</el-button>
                                 <el-button type="text" v-else="is_login">您好，{{user.username}}</el-button>
                                 <el-button type="text" @click="registerUser" v-if="!is_login">注册</el-button>
-                                <el-button type="text" @click="" v-if="is_login">我的订单</el-button>
+                                <el-button type="text" @click="myOrder" v-if="is_login">我的订单</el-button>
                                 <el-button type="text" @click="myCart" v-if="is_login">购物车</el-button>
                                 <el-button type="text" @click="userInfo" v-if="is_login">我的信息</el-button>
                                 <el-button type="text" @click="loginOut" v-if="is_login">退出</el-button>
@@ -488,8 +488,54 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                                     </el-table-column>
                                 </el-table>
                                 <div style="margin-top: 20px;margin-left: 20px">
-                                    <el-button @click="deleteAllCart" v-if="is_delete_all" type="primary">全部删除</el-button>
+                                    <el-button @click="deleteAllCart" v-if="is_delete_all" type="primary">全部删除
+                                    </el-button>
                                 </div>
+                            </template>
+                        </el-drawer>
+                        <el-drawer
+                                title="我的订单"
+                                size="60%"
+                                :visible.sync="is_show_order"
+                                :direction="direction"
+                        >
+                            <template>
+                                <el-table
+                                        :data="orderList"
+                                        tooltip-effect="dark"
+                                        style="width: 100%"
+                                >
+                                    <el-table-column
+                                            align="center"
+                                            prop="order_sn"
+                                            label="订单号"
+                                    >
+                                    </el-table-column>
+                                    <el-table-column
+                                            align="center"
+                                            prop="title"
+                                            label="商品名称"
+                                    >
+                                    </el-table-column>
+                                    <el-table-column
+                                            align="center"
+                                            prop="total"
+                                            label="商品数量(单位/件)"
+                                    >
+                                    </el-table-column>
+                                    <el-table-column
+                                            align="center"
+                                            prop="order_price"
+                                            label="订单价格(单位/元)"
+                                            show-overflow-tooltip>
+                                    </el-table-column>
+                                    <el-table-column
+                                            align="center"
+                                            prop="created_at"
+                                            label="下单时间"
+                                            show-overflow-tooltip>
+                                    </el-table-column>
+                                </el-table>
                             </template>
                         </el-drawer>
                     </el-main>
@@ -554,6 +600,8 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                 };
                 return {
                     is_delete_all: false,
+                    is_show_order: false,
+                    orderList: [],
                     cartList: [],
                     multipleSelection: [],
                     is_login: false,
@@ -645,7 +693,23 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                 this.getGoodsCategoryList()
             },
             methods: {
-                deleteAllCart(){
+                myOrder() {
+                    this.getMyOrderList();
+                    this.is_show_order = true
+                },
+                getMyOrderList() {
+                    let url = '<?php echo \yii\helpers\Url::toRoute('order/get-order-list');?>';
+                    axios.post(url)
+                        .then(response => {
+                            const resp = response.data;
+                            console.log('获取我的订单列表结果', resp);
+                            this.orderList = resp.result.list
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        });
+                },
+                deleteAllCart() {
                     let categoryIds = [];
                     this.multipleSelection.map((item, index) => {
                         categoryIds.push(item.id);
@@ -706,9 +770,9 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                 },
                 handleSelectionChange(val) {
                     this.multipleSelection = val;
-                    if(this.multipleSelection.length > 0){
+                    if (this.multipleSelection.length > 0) {
                         this.is_delete_all = true
-                    }else {
+                    } else {
                         this.is_delete_all = false
                     }
                 },
@@ -739,8 +803,25 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                         });
                 },
                 buyNow(id) {
-                    this.$message.success('购买成功');
-                    this.centerDialogVisible = false
+                    let url = '<?php echo \yii\helpers\Url::toRoute('order/create-order');?>';
+                    let param = new URLSearchParams();
+                    param.append('goods_id', id);
+                    param.append('total', this.num);
+                    axios.post(url, param)
+                        .then(response => {
+                            const resp = response.data;
+                            console.log('立即购买结果', resp);
+                            if (resp.code === 200) {
+                                this.$message.success(resp.message);
+                                this.centerDialogVisible = false
+                                this.num = 1;
+                            } else {
+                                this.$message.success(resp.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        });
                 },
                 getGoodsDetail(item) {
                     console.log('查看商品详情', item)
@@ -1000,7 +1081,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                         email: this.user.email,
                         mobile: this.user.mobile,
                         address: this.user.address,
-                        avatar: this.realAvatar
+                        avatar: this.realAvatar ? this.realAvatar : this.user.avatar
                     };
                     let param = new URLSearchParams();
                     param.append('gender', postData.gender);

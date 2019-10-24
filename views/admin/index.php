@@ -91,7 +91,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                  <li class="layui-nav-item">
                     <a href="javascript:;">订单管理</a>
                     <dl class="layui-nav-child">
-                        <dd><a href="javascript:;">订单列表</a></dd>
+                        <dd><a href="<?php echo \yii\helpers\Url::to(['order/list'])?>" target="mainFrame">订单列表</a></dd>
                     </dl>
                 </li>
                     <li class="layui-nav-item">

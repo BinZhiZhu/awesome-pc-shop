@@ -75,8 +75,8 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
 <div id="app">
     <div class="tab">
         <el-breadcrumb separator-class="el-icon-arrow-right">
-            <el-breadcrumb-item :to="{ path: '/' }">用户管理</el-breadcrumb-item>
-            <el-breadcrumb-item>后台用户列表</el-breadcrumb-item>
+            <el-breadcrumb-item :to="{ path: '/' }">订单管理</el-breadcrumb-item>
+            <el-breadcrumb-item>订单列表</el-breadcrumb-item>
         </el-breadcrumb>
     </div>
     <template>
@@ -94,53 +94,44 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                 <template slot-scope="scope">{{scope.row.id}}</template>
             </el-table-column>
             <el-table-column
-                    label="用户名"
+                    label="订单号"
                     align="center"
                     width="150">
-                <template slot-scope="scope">{{scope.row.username}}</template>
+                <template slot-scope="scope">{{scope.row.order_sn}}</template>
             </el-table-column>
             <el-table-column
-                    label="用户角色"
+                    label="所属商家"
                     align="center"
-                    width="100">
-                <template slot-scope="scope">{{scope.row.role_name}}</template>
+                    width="120">
+                <template slot-scope="scope">{{scope.row.created_by}}</template>
             </el-table-column>
             <el-table-column
-                    label="登录次数"
-                    align="center"
-                    width="100">
-                <template slot-scope="scope">{{scope.row.login_count}}</template>
-            </el-table-column>
-            <el-table-column
-                    label="域名信息"
+                    label="商品名称"
                     align="center"
                     width="180">
-                <template slot-scope="scope">{{scope.row.host_info}}</template>
+                <template slot-scope="scope">{{scope.row.title}}</template>
             </el-table-column>
             <el-table-column
-                    label="注册日期"
+                    label="订单价格(单位/元)"
                     align="center"
-                    width="180">
+                    width="150">
+                <template slot-scope="scope">{{scope.row.order_price}}</template>
+            </el-table-column>
+            <el-table-column
+                    label="订单数量(单位/件)"
+                    align="center"
+                    width="150">
+                <template slot-scope="scope">{{scope.row.total}}</template>
+            </el-table-column>
+            <el-table-column
+                    label="下单时间"
+                    align="center"
+                    >
                 <template slot-scope="scope">
                     <i class="el-icon-time"></i>
-                    <span style="margin-left: 10px">{{ scope.row.register_time }}</span>
+                    <span style="margin-left: 10px">{{ scope.row.created_at }}</span>
                 </template>
             </el-table-column>
-            <el-table-column
-                    label="最近登录时间"
-                    align="center"
-                    width="180">
-                <template slot-scope="scope">
-                    <i class="el-icon-time"></i>
-                    <span style="margin-left: 10px">{{ scope.row.lastvisit_time }}</span>
-                </template>
-            </el-table-column>
-<!--            <el-table-column-->
-<!--                    label="上一次访问IP"-->
-<!--                    align="center"-->
-<!--                    width="120">-->
-<!--                <template slot-scope="scope">{{scope.row.lastvisit_ip}}</template>-->
-<!--            </el-table-column>-->
             <el-table-column
                     label="操作"
                     align="center"
@@ -148,45 +139,11 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                 <template slot-scope="scope">
                     <el-button
                             size="mini"
-                            @click="handleEdit(scope.$index, scope.row)">查看</el-button>
-                    <el-button
-                            size="mini"
                             type="danger"
                             @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
-        <el-dialog
-                title="用户信息"
-                :visible.sync="dialogUserInfoVisible"
-                width="32%"
-                center
-                :before-close="handleClose"
-        >
-            <el-form :model="userForm" :rules="userRules" ref="userForm">
-                <el-form-item label="编号" :label-width="formLabelWidth" prop="username">
-                    <el-input v-model="user.id" disabled></el-input>
-                </el-form-item>
-            </el-form>
-            <el-form :model="userForm" :rules="userRules" ref="userForm">
-                <el-form-item label="账号" :label-width="formLabelWidth" prop="username">
-                    <el-input v-model="user.username" disabled></el-input>
-                </el-form-item>
-            </el-form>
-            <el-form :model="userForm" :rules="userRules" ref="userForm">
-                <el-form-item label="角色" :label-width="formLabelWidth" prop="role">
-                    <el-input v-model="user.role_name" disabled></el-input>
-                </el-form-item>
-            </el-form>
-            <el-form :model="userForm" :rules="userRules" ref="userForm">
-                <el-form-item label="登录次数" :label-width="formLabelWidth" prop="role">
-                    <el-input v-model="user.login_count" disabled></el-input>
-                </el-form-item>
-            </el-form>
-            <span slot="footer" class="dialog-footer">
-                    <el-button type="primary" @click="handleClose">关闭</el-button>
-            </span>
-        </el-dialog>
     </template>
     <div class="block">
         <el-pagination
@@ -211,49 +168,10 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
         el: '#app',
         router,
         data() {
-            //检验手机号码
-            var validateMobile= (rule, value, callback) => {
-                if(value){
-                    if(!(/^1[3456789]\d{9}$/.test(value))){
-                        callback(new Error('手机号码格式有误，请重新填写'));
-                    }
-                }
-            };
-            var validateEmail = (rule,vaule,callback) =>{
-                if(vaule){
-                    var pattern = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
-                    if(!pattern.test(vaule)){
-                        callback(new Error('邮箱格式有误，请重新填写'));
-                    }
-                }
-            };
             return {
                 page:1,
                 total:"",
-                dialogUserInfoVisible: false,
                 formLabelWidth: '120px',
-                user: {},
-                userForm: {
-                    email: '',
-                    address: '',
-                    mobile: '',
-                    gender: '',
-                },
-                //校验规则
-                userRules: {
-                    mobile: [
-                        {
-                            validator: validateMobile,
-                            trigger: 'blur'
-                        }
-                    ],
-                    email: [
-                        {
-                            validator: validateEmail,
-                            trigger: 'blur'
-                        }
-                    ]
-                },
                 tableData: [
                     {
                         id: 0,
@@ -272,32 +190,21 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
             };
         },
         created: function () {
-            // `this` 指向 vm 实例
-            this.getUserList()
+            this.getOrderList()
         },
         methods: {
-            getUserList(){
-                let url = '<?php echo \yii\helpers\Url::toRoute('backend/get-user-list');?>';
+            getOrderList(){
+                let url = '<?php echo \yii\helpers\Url::toRoute('order/get-backend-order-list');?>';
                 axios.post(url)
                     .then(response => {
                         const resp = response.data;
-                        console.log('success', resp);
+                        console.log('获取订单列表结果', resp);
                         this.tableData = resp.result.list
                         this.total = resp.result.total
                     })
                     .catch(error => {
                         console.log(error)
                     });
-            },
-            handleClose(done) {
-                this.dialogUserInfoVisible = false
-            },
-            saveInfoSuccess(){
-                this.$notify({
-                    title: '保存用户信息成功',
-                    message: '',
-                    type: 'success',
-                });
             },
             prev_click(){
                 var page = parseInt(app.page)-1;
@@ -336,52 +243,9 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                     type: type
                 });
             },
-            handleEdit(index, row) {
-                console.log(index, row);
-                this.dialogUserInfoVisible = true
-                this.user = row
-            },
-            //提交用户信息表单
-            submitUserForm(formName) {
-                console.log('submitUserForm',formName)
-                let url = '<?php echo \yii\helpers\Url::toRoute('pc/edit-user-info');?>';
-                const postData = {
-                    gender:this.user.gender,
-                    email: this.user.email,
-                    mobile: this.user.mobile,
-                    address: this.user.address,
-                    avatar: this.realAvatar
-                };
-                let param = new URLSearchParams();
-                param.append('gender', postData.gender);
-                param.append('email', postData.email);
-                param.append('mobile', postData.mobile);
-                param.append('address', postData.address);
-                param.append('avatar', postData.avatar);
-                param.append('user_id', this.user.id);
-                console.log('保存用户信息提交过去的参数', postData)
-                axios.post(url, param)
-                    .then(response => {
-                        console.log('保存用户信息成功', response);
-                        if (response.data.code === 200) {
-                            this.saveInfoSuccess()
-                            this.dialogUserInfoVisible = false
-                            this.getUserInfo()
-                        }else {
-                            this.alertMessage(response.data.message, true, 'error');
-                        }
-                    })
-                    .catch(error => {
-                        console.log(error)
-                    });
-            },
-            //重置表单 移除校验结果
-            resetForm(formName) {
-                this.$refs[formName].resetFields();
-            },
             handleDelete(index, row) {
                 console.log(index, row);
-                let url = '<?php echo \yii\helpers\Url::toRoute('backend/delete-user');?>';
+                let url = '<?php echo \yii\helpers\Url::toRoute('order/delete-order');?>';
                 let param = new URLSearchParams();
                 const postdata = {
                     id: row.id
@@ -392,7 +256,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                     .then(response => {
                         const resp = response.data;
                         console.log('success', resp);
-                        this.getUserList()
+                        this.getOrderList()
                         this.alertMessage(resp.message,true,resp.code === 200 ? 'success': 'error')
                     })
                     .catch(error => {
