@@ -97,6 +97,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                     <li class="layui-nav-item">
                         <a href="javascript:;">商品管理</a>
                         <dl class="layui-nav-child">
+                            <dd><a href="<?php echo \yii\helpers\Url::to(['backend/goods-list'])?>" target="mainFrame">商品列表</a></dd>
                             <dd><a href="<?php echo \yii\helpers\Url::to(['goods/category'])?>" target="mainFrame">添加商品分类</a></dd>
                             <dd><a href="<?php echo \yii\helpers\Url::to(['goods/category-list'])?>" target="mainFrame">商品分类列表</a></dd>
                         </dl>

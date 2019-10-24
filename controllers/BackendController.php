@@ -29,6 +29,11 @@ class BackendController extends Controller
         return $this->render('pc');
     }
 
+    public function actionGoodsList()
+    {
+        return $this->render('goods-list');
+    }
+
 
     /**
      * 获取后台用户列表

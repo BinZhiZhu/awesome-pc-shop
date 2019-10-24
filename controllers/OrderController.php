@@ -83,6 +83,20 @@ class OrderController extends Controller
             ]);
         }
 
+        //先校验库存
+
+        if ($goods->stock <= 0) {
+            return Yii::createObject([
+                'class' => 'yii\web\Response',
+                'format' => \yii\web\Response::FORMAT_JSON,
+                'data' => [
+                    'code' => -100,
+                    'message' => '抱歉，库存不足',
+                    'result' => []
+                ]
+            ]);
+        }
+
         //计算订单价格
         $order_price = number_format($goods->price * intval($total), 2);
 
@@ -97,9 +111,13 @@ class OrderController extends Controller
             $order->goods_id = $goods_id;
             $order->status = StatusTypeEnum::ON;
 
-            Yii::$app->getDb()->transaction(function () use ($order) {
+            Yii::$app->getDb()->transaction(function () use ($order, $goods) {
 
                 $order->save(false);
+
+                $goods->stock--;
+                $goods->save();
+
             });
 
         } catch (\Exception $e) {
@@ -161,7 +179,7 @@ class OrderController extends Controller
             ->where([
                 'status' => StatusTypeEnum::ON,
                 'member_id' => $user_id,
-                'is_deleted'=>StatusTypeEnum::OFF
+                'is_deleted' => StatusTypeEnum::OFF
             ])
             ->orderBy(['id' => SORT_DESC])
             ->all();
@@ -220,7 +238,7 @@ class OrderController extends Controller
         $list = OrderEntity::find()
             ->where([
                 'status' => StatusTypeEnum::ON,
-                'is_deleted'=>StatusTypeEnum::OFF
+                'is_deleted' => StatusTypeEnum::OFF
             ])
             ->orderBy(['id' => SORT_DESC])
             ->all();

@@ -40,7 +40,7 @@ class GoodsController extends Controller
 
 
     /**
-     * 获取商品列表
+     * 获取前台商品列表
      *
      * @return object
      * @throws \yii\base\InvalidConfigException
@@ -89,6 +89,56 @@ class GoodsController extends Controller
             ]
         ]);
     }
+
+    /**
+     * 获取后台商品列表
+     *
+     * @return object
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function actionGetBackendGoodsList()
+    {
+        $session = Yii::$app->session;
+        $array = $session->get('is_user_id');
+        $user_id = $array['value'];
+
+        $user = DevUsers::findOne($user_id);
+        if (!$user) {
+            //TODO
+        }
+
+        $goods = GoodsEntity::find()
+            ->where([
+                'status' => StatusTypeEnum::ON,
+                'is_deleted' => StatusTypeEnum::OFF
+            ])
+            ->orderBy(['id' => SORT_DESC])
+            ->asArray()
+            ->all();
+
+        foreach ($goods as &$good) {
+            $good['created_at'] = date("Y:m:d H:i", $good['created_at']);
+            $category = GoodsCategoryEntity::findOne([
+                'id' => $good['category_id']
+            ]);
+            $good['category_title'] = $category ? $category->title : '';
+        }
+
+        unset($good);
+
+        return Yii::createObject([
+            'class' => 'yii\web\Response',
+            'format' => \yii\web\Response::FORMAT_JSON,
+            'data' => [
+                'code' => 200,
+                'result' => [
+                    'list' => $goods,
+                    'total' => count($goods)
+                ]
+            ]
+        ]);
+    }
+
 
     /**
      * 获取商品分类列表
