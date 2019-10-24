@@ -164,6 +164,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
             flex-direction: column;
             line-height: 30px;
         }
+
         .avatar-uploader .el-upload {
             width: 80px;
             height: 80px;
@@ -173,9 +174,11 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
             position: relative;
             overflow: hidden;
         }
+
         .avatar-uploader .el-upload:hover {
             border-color: #409EFF;
         }
+
         .avatar-uploader-icon {
             font-size: 28px;
             color: #8c939d;
@@ -184,29 +187,34 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
             line-height: 178px;
             text-align: center;
         }
+
         .avatar {
             width: 80px;
             height: 80px;
             display: block;
         }
 
-        .link-balance__right{
+        .link-balance__right {
             display: flex;
             flex-direction: row;
             align-items: center;
         }
-        .user-avatar{
+
+        .user-avatar {
             align-items: center;
             padding-right: 20px;
         }
-        .user-button{
+
+        .user-button {
 
         }
-        .empty-goods{
+
+        .empty-goods {
             display: flex;
             flex-direction: row;
         }
-        .empty-goods-text{
+
+        .empty-goods-text {
             padding-left: 500px;
         }
     </style>
@@ -256,7 +264,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                                 <el-button type="text" v-else="is_login">您好，{{user.username}}</el-button>
                                 <el-button type="text" @click="registerUser" v-if="!is_login">注册</el-button>
                                 <el-button type="text" @click="" v-if="is_login">我的订单</el-button>
-                                <el-button type="text" @click="" v-if="is_login">购物车</el-button>
+                                <el-button type="text" @click="myCart" v-if="is_login">购物车</el-button>
                                 <el-button type="text" @click="userInfo" v-if="is_login">我的信息</el-button>
                                 <el-button type="text" @click="loginOut" v-if="is_login">退出</el-button>
                                 <el-button type="text" @click="">中国鲜花礼品网:中国鲜花网领先品牌</el-button>
@@ -312,7 +320,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                                 <el-button @click="resetForm('form')">重置</el-button>
                         </span>
                         </el-dialog>
-<!--                        用户信息部分-->
+                        <!--                        用户信息部分-->
                         <el-dialog
                                 title="用户信息"
                                 :visible.sync="dialogUserInfoVisible"
@@ -322,16 +330,16 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                         >
                             <el-form :model="userForm" :rules="userRules" ref="userForm">
                                 <el-form-item label="头像" :label-width="formLabelWidth" prop="avatar">
-                                <el-upload
-                                        class="avatar-uploader"
-                                        action="https://jsonplaceholder.typicode.com/posts/"
-                                        :show-file-list="false"
-                                        auto-upload
-                                        :on-success="handleAvatarSuccess"
-                                        :before-upload="beforeAvatarUpload">
-                                    <img v-if="user.avatar" :src="user.avatar" class="avatar">
-                                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                                </el-upload>
+                                    <el-upload
+                                            class="avatar-uploader"
+                                            action="https://jsonplaceholder.typicode.com/posts/"
+                                            :show-file-list="false"
+                                            auto-upload
+                                            :on-success="handleAvatarSuccess"
+                                            :before-upload="beforeAvatarUpload">
+                                        <img v-if="user.avatar" :src="user.avatar" class="avatar">
+                                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                                    </el-upload>
                                 </el-form-item>
                                 <el-form-item label="账号" :label-width="formLabelWidth" prop="username">
                                     <el-input v-model="user.username" disabled></el-input>
@@ -340,14 +348,14 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                                     <el-input v-model="user.mobile" autocomplete="off"></el-input>
                                 </el-form-item>
                                 <el-form-item label="性别" :label-width="formLabelWidth" prop="gender">
-                                <el-select v-model="user.gender" placeholder="请选择">
-                                    <el-option
-                                            v-for="item in options"
-                                            :key="item.value"
-                                            :label="item.label"
-                                            :value="item.value">
-                                    </el-option>
-                                </el-select>
+                                    <el-select v-model="user.gender" placeholder="请选择">
+                                        <el-option
+                                                v-for="item in options"
+                                                :key="item.value"
+                                                :label="item.label"
+                                                :value="item.value">
+                                        </el-option>
+                                    </el-select>
                                 </el-form-item>
                                 <el-form-item label="邮箱" :label-width="formLabelWidth" prop="email">
                                     <el-input v-model="user.email" autocomplete="off"></el-input>
@@ -371,9 +379,10 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                         <el-submenu index="1">
                             <template slot="title"><i class="el-icon-goods"></i>商品分类</template>
                             <template v-for="category in goodsCategoryList" :key="category">
-<!--                                <el-menu-item-group>-->
-                                <el-menu-item :index="category.id" @click="clickCategory(category)">{{category.title}}</el-menu-item>
-<!--                                </el-menu-item-group>-->
+                                <!--                                <el-menu-item-group>-->
+                                <el-menu-item :index="category.id" @click="clickCategory(category)">{{category.title}}
+                                </el-menu-item>
+                                <!--                                </el-menu-item-group>-->
                             </template>
                         </el-submenu>
                     </el-menu>
@@ -390,7 +399,8 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                         </template>
                         <!-- 商品图片-->
                         <div class="goods-balance">
-                            <div class="goods-balance__item" v-for="item in goodsList" v-if="goodsList.length>0" @click="getGoodsDetail(item)">
+                            <div class="goods-balance__item" v-for="item in goodsList" v-if="goodsList.length>0"
+                                 @click="getGoodsDetail(item)">
                                 <img :src="item.thumb" alt="" class="goodsImg">
                                 <div class="goods-info">
                                     <span>{{item.title}}</span>
@@ -409,20 +419,79 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                                 :visible.sync="centerDialogVisible"
                                 width="30%"
                                 center>
-                                <div>商品标题:     {{chooseGoods.title}}</div>
-                                <div>商品副标题:    {{chooseGoods.subtitle}}</div>
-                                <div>商品分类:    {{chooseGoods.category_title}}</div>
-                                <div>商品价格:    <span style="color: red">￥{{chooseGoods.price}}</span></div>
-                                <div>商品库存:    {{chooseGoods.stock}}</div>
-                                <div>商品已售数量:    {{chooseGoods.sell_num}}</div>
-                                <div>购买数量:
-                                   &nbsp&nbsp&nbsp <el-input-number v-model="num" size="small" @change="handleChange" :min="1" :max="10" label=""></el-input-number>
-                                </div>
+                            <div>商品标题: {{chooseGoods.title}}</div>
+                            <div>商品副标题: {{chooseGoods.subtitle}}</div>
+                            <div>商品分类: {{chooseGoods.category_title}}</div>
+                            <div>商品价格: <span style="color: red">￥{{chooseGoods.price}}</span></div>
+                            <div>商品库存: {{chooseGoods.stock}}</div>
+                            <div>商品已售数量: {{chooseGoods.sell_num}}</div>
+                            <div>购买数量:
+                                &nbsp&nbsp&nbsp
+                                <el-input-number v-model="num" size="small" @change="handleChange" :min="1" :max="10"
+                                                 label=""></el-input-number>
+                            </div>
                             <span slot="footer" class="dialog-footer">
                            <el-button type="primary" @click="addToCart(chooseGoods.id)">加入购物车</el-button>
                           <el-button type="primary" @click="buyNow(chooseGoods.id)">立即购买</el-button>
                  </span>
                         </el-dialog>
+                        <el-drawer
+                                title="我的购物车"
+                                size="50%"
+                                :visible.sync="is_show_cart"
+                                :direction="direction"
+                        >
+                            <template>
+                                <el-table
+                                        ref="multipleTable"
+                                        :data="cartList"
+                                        tooltip-effect="dark"
+                                        style="width: 100%"
+                                        @selection-change="handleSelectionChange">
+                                    <el-table-column
+                                            align="center"
+                                            type="selection"
+                                            width="55">
+                                    </el-table-column>
+                                    <el-table-column
+                                            align="center"
+                                            prop="title"
+                                            label="商品名称"
+                                    >
+                                    </el-table-column>
+                                    <el-table-column
+                                            align="center"
+                                            prop="total"
+                                            label="商品数量(单位/件)"
+                                    >
+                                    </el-table-column>
+                                    <el-table-column
+                                            align="center"
+                                            prop="price"
+                                            label="商品价格(单位/元)"
+                                            show-overflow-tooltip>
+                                    </el-table-column>
+                                    <el-table-column
+                                            label="操作"
+                                            align="center"
+                                    >
+                                        <template slot-scope="scope">
+                                            <!--                                            <el-button-->
+                                            <!--                                                    size="mini"-->
+                                            <!--                                                    @click="handleEdit(scope.$index, scope.row)">编辑</el-button>-->
+                                            <el-button
+                                                    size="mini"
+                                                    type="danger"
+                                                    @click="handleDelete(scope.$index, scope.row)">删除
+                                            </el-button>
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
+                                <div style="margin-top: 20px;margin-left: 20px">
+                                    <el-button @click="deleteAllCart" v-if="is_delete_all" type="primary">全部删除</el-button>
+                                </div>
+                            </template>
+                        </el-drawer>
                     </el-main>
                     <el-footer>
                         花礼网 （中国鲜花礼品网） xxxxx版权 中国鲜花网领先品牌，鲜花速递专家！
@@ -468,22 +537,25 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                     }
                 };
                 //检验手机号码
-                var validateMobile= (rule, value, callback) => {
-                    if(value){
-                        if(!(/^1[3456789]\d{9}$/.test(value))){
+                var validateMobile = (rule, value, callback) => {
+                    if (value) {
+                        if (!(/^1[3456789]\d{9}$/.test(value))) {
                             callback(new Error('手机号码格式有误，请重新填写'));
                         }
                     }
                 };
-                var validateEmail = (rule,vaule,callback) =>{
-                    if(vaule){
+                var validateEmail = (rule, vaule, callback) => {
+                    if (vaule) {
                         var pattern = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
-                        if(!pattern.test(vaule)){
+                        if (!pattern.test(vaule)) {
                             callback(new Error('邮箱格式有误，请重新填写'));
                         }
                     }
                 };
                 return {
+                    is_delete_all: false,
+                    cartList: [],
+                    multipleSelection: [],
                     is_login: false,
                     realAvatar: '',
                     user: {},
@@ -500,6 +572,8 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                         }
                     ],
                     imageUrl: '',
+                    direction: 'rtl',
+                    is_show_cart: false,
                     dialogVisible: false,
                     centerDialogVisible: false,
                     dialogRegisterVisible: false,
@@ -565,49 +639,121 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                     goodsCategoryList: []
                 };
             },
-            created: function(){
+            created: function () {
                 this.getUserInfo()
                 this.getGoodsList()
                 this.getGoodsCategoryList()
             },
             methods: {
-                handleChange(value) {
-                    console.log(value);
-                    this.num = value
-                },
-                addToCart(id){
-                    console.log('购买数量',this.num)
-                    let url = '<?php echo \yii\helpers\Url::toRoute('member/add-cart');?>';
+                deleteAllCart(){
+                    let categoryIds = [];
+                    this.multipleSelection.map((item, index) => {
+                        categoryIds.push(item.id);
+                    })
+                    console.log('选择的购物车IDS', categoryIds)
+                    let url = '<?php echo \yii\helpers\Url::toRoute('member/delete-cart');?>';
                     let param = new URLSearchParams();
-                    param.append('goods_id',id);
-                    param.append('total',this.num);
-                    axios.post(url,param)
+                    param.append('cart_id', categoryIds);
+                    axios.post(url, param)
                         .then(response => {
                             const resp = response.data;
-                            console.log('加入购物车结果', resp);
-                            this.$message.success('加入成功');
-                            this.centerDialogVisible = false
+                            console.log('获取移除购物车结果', resp);
+                            if (resp.code === 200) {
+                                this.$message.success(resp.message);
+                                this.is_show_cart = false
+                            } else {
+                                this.$message.success(resp.message);
+                            }
                         })
                         .catch(error => {
                             console.log(error)
                         });
                 },
-                buyNow(id){
+                getMyCartList() {
+                    let url = '<?php echo \yii\helpers\Url::toRoute('member/my-cart-list');?>';
+                    axios.post(url)
+                        .then(response => {
+                            const resp = response.data;
+                            console.log('获取我的购物车列表结果', resp);
+                            this.cartList = resp.result.list
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        });
+                },
+                handleEdit(index, row) {
+                    console.log(index, row);
+                },
+                handleDelete(index, row) {
+                    console.log(index, row);
+                    let url = '<?php echo \yii\helpers\Url::toRoute('member/delete-cart');?>';
+                    let param = new URLSearchParams();
+                    param.append('cart_id', row.id);
+                    axios.post(url, param)
+                        .then(response => {
+                            const resp = response.data;
+                            console.log('获取移除购物车结果', resp);
+                            if (resp.code === 200) {
+                                this.$message.success(resp.message);
+                                this.is_show_cart = false
+                            } else {
+                                this.$message.success(resp.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        });
+                },
+                handleSelectionChange(val) {
+                    this.multipleSelection = val;
+                    if(this.multipleSelection.length > 0){
+                        this.is_delete_all = true
+                    }else {
+                        this.is_delete_all = false
+                    }
+                },
+                myCart() {
+                    this.is_show_cart = true;
+                    this.getMyCartList()
+                },
+                handleChange(value) {
+                    console.log(value);
+                    this.num = value
+                },
+                addToCart(id) {
+                    console.log('购买数量', this.num)
+                    let url = '<?php echo \yii\helpers\Url::toRoute('member/add-cart');?>';
+                    let param = new URLSearchParams();
+                    param.append('goods_id', id);
+                    param.append('total', this.num);
+                    axios.post(url, param)
+                        .then(response => {
+                            const resp = response.data;
+                            console.log('加入购物车结果', resp);
+                            this.$message.success('加入成功');
+                            this.centerDialogVisible = false
+                            this.num = 1;
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        });
+                },
+                buyNow(id) {
                     this.$message.success('购买成功');
                     this.centerDialogVisible = false
                 },
-                getGoodsDetail(item){
-                    console.log('查看商品详情',item)
+                getGoodsDetail(item) {
+                    console.log('查看商品详情', item)
                     this.centerDialogVisible = true
                     this.chooseGoods = item
                 },
                 //点击分类
-                clickCategory(e){
-                    console.log('点击分类',e)
+                clickCategory(e) {
+                    console.log('点击分类', e)
                     let url = '<?php echo \yii\helpers\Url::toRoute('goods/goods-list');?>';
                     let param = new URLSearchParams();
-                    param.append('category_id',e.id);
-                    axios.post(url,param)
+                    param.append('category_id', e.id);
+                    axios.post(url, param)
                         .then(response => {
                             const resp = response.data;
                             console.log('获取分类筛选商品列表结果', resp);
@@ -618,11 +764,11 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                         });
                 },
                 //商品搜索
-                searchGoods(){
+                searchGoods() {
                     let url = '<?php echo \yii\helpers\Url::toRoute('goods/goods-list');?>';
                     let param = new URLSearchParams();
-                    param.append('title',this.search_title);
-                    axios.post(url,param)
+                    param.append('title', this.search_title);
+                    axios.post(url, param)
                         .then(response => {
                             const resp = response.data;
                             console.log('获取标题筛选商品列表结果', resp);
@@ -632,7 +778,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                             console.log(error)
                         });
                 },
-                getGoodsList(){
+                getGoodsList() {
                     let url = '<?php echo \yii\helpers\Url::toRoute('goods/goods-list');?>';
                     axios.post(url)
                         .then(response => {
@@ -644,7 +790,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                             console.log(error)
                         });
                 },
-                getGoodsCategoryList(){
+                getGoodsCategoryList() {
                     let url = '<?php echo \yii\helpers\Url::toRoute('goods/get-goods-category-list');?>';
                     axios.post(url)
                         .then(response => {
@@ -663,8 +809,8 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                     //生成了blob文件
                     let url = '<?php echo \yii\helpers\Url::toRoute('pc/upload');?>';
                     const data = new FormData();
-                    data.append('file',file.raw);
-                    axios.post(url,data)
+                    data.append('file', file.raw);
+                    axios.post(url, data)
                         .then(response => {
                             console.log('获取图片上传结果', response.data);
                             const resp = response.data.result;
@@ -675,7 +821,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                         });
                 },
                 beforeAvatarUpload(file) {
-                    console.log('beforeAvatarUpload',file)
+                    console.log('beforeAvatarUpload', file)
                     const isJPG = file.type === 'image/jpeg';
                     const isLt2M = file.size / 1024 / 1024 < 2;
 
@@ -687,7 +833,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                     }
                     return isJPG && isLt2M;
                 },
-                getUserInfo(){
+                getUserInfo() {
                     let url = '<?php echo \yii\helpers\Url::toRoute('pc/get-user-info');?>';
                     let param = new URLSearchParams();
                     axios.post(url)
@@ -702,7 +848,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                         });
                 },
                 //查看我的信息
-                userInfo(){
+                userInfo() {
                     this.dialogUserInfoVisible = true
                 },
                 registerSuccess() {
@@ -726,7 +872,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                         type: 'success',
                     });
                 },
-                saveInfoSuccess(){
+                saveInfoSuccess() {
                     this.$notify({
                         title: '保存用户信息成功',
                         message: '快去查看你的信息吧',
@@ -847,10 +993,10 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                 },
                 //提交用户信息表单
                 submitUserForm(formName) {
-                    console.log('submitUserForm',formName)
+                    console.log('submitUserForm', formName)
                     let url = '<?php echo \yii\helpers\Url::toRoute('pc/edit-user-info');?>';
                     const postData = {
-                        gender:this.user.gender,
+                        gender: this.user.gender,
                         email: this.user.email,
                         mobile: this.user.mobile,
                         address: this.user.address,
@@ -871,7 +1017,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                                 this.saveInfoSuccess()
                                 this.dialogUserInfoVisible = false
                                 this.getUserInfo()
-                            }else {
+                            } else {
                                 this.alertMessage(response.data.message, true, 'error');
                             }
                         })

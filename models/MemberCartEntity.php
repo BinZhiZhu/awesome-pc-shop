@@ -14,6 +14,7 @@ use Yii;
  * @property int $total 购物车数量
  * @property string $market_price 价格
  * @property int $is_deleted 是否移除
+ * @property GoodsEntity goodsEntity
  */
 class MemberCartEntity extends \yii\db\ActiveRecord
 {
@@ -49,6 +50,25 @@ class MemberCartEntity extends \yii\db\ActiveRecord
             'total' => 'Total',
             'market_price' => 'Market Price',
             'is_deleted' => 'Is Deleted',
+        ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getGoodsEntity()
+    {
+        return $this->hasOne(GoodsEntity::className(),['id'=>'goods_id']);
+    }
+
+    public function getApiArray()
+    {
+        return [
+            'id'=>$this->id,
+            'title'=> $this->goodsEntity->title,
+            'total'=>"{$this->total}/件",
+            'goods_id'=>$this->goods_id,
+            'price'=>"￥{$this->market_price}"
         ];
     }
 }

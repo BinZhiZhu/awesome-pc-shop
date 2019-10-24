@@ -131,6 +131,12 @@ class MemberController extends Controller
             ->orderBy(['created_at' => SORT_DESC])
             ->all();
 
+        /** @var MemberCartEntity $item */
+        foreach ($list as &$item) {
+            $item = $item->getApiArray();
+        }
+        unset($item);
+
         return Yii::createObject([
             'class' => 'yii\web\Response',
             'format' => \yii\web\Response::FORMAT_JSON,
@@ -145,12 +151,81 @@ class MemberController extends Controller
     }
 
     /**
-     * TODO 移除购物车
+     * 移除购物车
+     *
+     * @return object
+     * @throws \yii\base\InvalidConfigException
      */
-    public function actionDeletedCart()
+    public function actionDeleteCart()
     {
-      $cart_id = Yii::$app->request->post('cart_id');
-      $cart_id = intval($cart_id);
+        $cart_id = Yii::$app->request->post('cart_id');
+        if (!(strpos($cart_id, ',') !== false)) {
+            $cart_id = intval($cart_id);
+            $cart = MemberCartEntity::findOne([
+                'id' => $cart_id
+            ]);
+
+            if (!$cart) {
+                return Yii::createObject([
+                    'class' => 'yii\web\Response',
+                    'format' => \yii\web\Response::FORMAT_JSON,
+                    'data' => [
+                        'code' => -100,
+                        'message' => '找不到购物车记录',
+                        'result' => []
+                    ]
+                ]);
+            }
+
+            $cart->is_deleted = StatusTypeEnum::ON;
+            $cart->save(false);
+
+            return Yii::createObject([
+                'class' => 'yii\web\Response',
+                'format' => \yii\web\Response::FORMAT_JSON,
+                'data' => [
+                    'code' => 200,
+                    'message' => '移除成功',
+                    'result' => [
+                        'cart_id' => $cart->id
+                    ]
+                ]
+            ]);
+        } else {
+            //多选处理
+
+            $cart_id = explode(',', $cart_id);
+            foreach ($cart_id as $item) {
+                $cart = MemberCartEntity::findOne([
+                    'id' => $item
+                ]);
+
+                if (!$cart) {
+                    return Yii::createObject([
+                        'class' => 'yii\web\Response',
+                        'format' => \yii\web\Response::FORMAT_JSON,
+                        'data' => [
+                            'code' => -100,
+                            'message' => '找不到购物车记录',
+                            'result' => []
+                        ]
+                    ]);
+                }
+
+                $cart->is_deleted = StatusTypeEnum::ON;
+                $cart->save(false);
+            }
+
+            return Yii::createObject([
+                'class' => 'yii\web\Response',
+                'format' => \yii\web\Response::FORMAT_JSON,
+                'data' => [
+                    'code' => 200,
+                    'message' => '移除成功',
+                    'result' => []
+                ]
+            ]);
+        }
 
     }
 
