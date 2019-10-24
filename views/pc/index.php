@@ -415,6 +415,9 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                                 <div>商品价格:    <span style="color: red">￥{{chooseGoods.price}}</span></div>
                                 <div>商品库存:    {{chooseGoods.stock}}</div>
                                 <div>商品已售数量:    {{chooseGoods.sell_num}}</div>
+                                <div>购买数量:
+                                   &nbsp&nbsp&nbsp <el-input-number v-model="num" size="small" @change="handleChange" :min="1" :max="10" label=""></el-input-number>
+                                </div>
                             <span slot="footer" class="dialog-footer">
                            <el-button type="primary" @click="addToCart(chooseGoods.id)">加入购物车</el-button>
                           <el-button type="primary" @click="buyNow(chooseGoods.id)">立即购买</el-button>
@@ -484,6 +487,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                     is_login: false,
                     realAvatar: '',
                     user: {},
+                    num: 1,
                     chooseGoods: {},
                     options: [
                         {
@@ -567,9 +571,26 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                 this.getGoodsCategoryList()
             },
             methods: {
+                handleChange(value) {
+                    console.log(value);
+                    this.num = value
+                },
                 addToCart(id){
-                    this.$message.success('加入成功');
-                    this.centerDialogVisible = false
+                    console.log('购买数量',this.num)
+                    let url = '<?php echo \yii\helpers\Url::toRoute('member/add-cart');?>';
+                    let param = new URLSearchParams();
+                    param.append('goods_id',id);
+                    param.append('total',this.num);
+                    axios.post(url,param)
+                        .then(response => {
+                            const resp = response.data;
+                            console.log('加入购物车结果', resp);
+                            this.$message.success('加入成功');
+                            this.centerDialogVisible = false
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        });
                 },
                 buyNow(id){
                     this.$message.success('购买成功');

@@ -10,6 +10,8 @@ use app\assets\ElementUI;
 
 ElementUI::register($this);
 AppAsset::register($this);
+$this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 'renderToolbar']);
+
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
