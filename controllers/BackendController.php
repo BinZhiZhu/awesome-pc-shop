@@ -8,6 +8,7 @@ use app\enums\StatusTypeEnum;
 use app\models\AppUsers;
 use app\models\DevUsers;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 
@@ -18,17 +19,28 @@ use yii\web\Controller;
 class BackendController extends Controller
 {
 
+    /**
+     * @return string
+     */
     public function actionIndex()
     {
         return $this->render('list');
     }
 
 
+    /**
+     * @return string
+     */
     public function actionPc()
     {
         return $this->render('pc');
     }
 
+    /**
+     * 商品列表
+     *
+     * @return string
+     */
     public function actionGoodsList()
     {
         return $this->render('goods-list');
@@ -38,7 +50,7 @@ class BackendController extends Controller
     /**
      * 获取后台用户列表
      * @return object
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function actionGetUserList()
     {
@@ -79,7 +91,7 @@ class BackendController extends Controller
      * 获取前台用户
      *
      * @return object
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function actionGetAppUserList()
     {
@@ -119,8 +131,7 @@ class BackendController extends Controller
      *
      * @return object
      * @throws \Throwable
-     * @throws \yii\base\InvalidConfigException
-     * @throws \yii\db\StaleObjectException
+     * @throws InvalidConfigException
      */
     public function actionDeleteUser()
     {
@@ -162,8 +173,7 @@ class BackendController extends Controller
      *
      * @return object
      * @throws \Throwable
-     * @throws \yii\base\InvalidConfigException
-     * @throws \yii\db\StaleObjectException
+     * @throws InvalidConfigException
      */
     public function actionDeleteAppUser()
     {

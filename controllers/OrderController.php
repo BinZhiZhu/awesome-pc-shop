@@ -12,15 +12,17 @@ use Yii;
 use yii\web\Controller;
 
 /**
- * Class OrderController
- * @package app\controllers
+ * 订单相关控制器
+ *
+ * @package 订单模块
  */
 class OrderController extends Controller
 {
     public $layout = false;
 
-
     /**
+     * 生成订单号
+     *
      * @return string
      */
     private function generateOrderSn()
@@ -36,7 +38,7 @@ class OrderController extends Controller
     }
 
     /**
-     * 创单
+     * 创建订单接口
      *
      * @return object
      * @throws \yii\base\InvalidConfigException
@@ -62,6 +64,19 @@ class OrderController extends Controller
                 'data' => [
                     'code' => -100,
                     'message' => '用户不存在',
+                    'result' => []
+                ]
+            ]);
+        }
+
+        //判断一下这个用户是否有收获地址
+        if (!$member->address) {
+            return Yii::createObject([
+                'class' => 'yii\web\Response',
+                'format' => \yii\web\Response::FORMAT_JSON,
+                'data' => [
+                    'code' => -100,
+                    'message' => '请先添加用户地址',
                     'result' => []
                 ]
             ]);

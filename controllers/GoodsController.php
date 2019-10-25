@@ -17,22 +17,33 @@ class GoodsController extends Controller
     public $layout = false;
 
 
+    /**
+     * @return string
+     */
     public function actionIndex()
     {
         return $this->render('index');
     }
 
+    /**
+     * @return string
+     */
     public function actionCategory()
     {
         return $this->render('category');
     }
 
+    /**
+     * @return string
+     */
     public function actionCategoryList()
     {
         return $this->render('category-list');
     }
 
-
+    /**
+     * @return string
+     */
     public function actionList()
     {
         return $this->render('list');

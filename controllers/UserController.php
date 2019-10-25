@@ -13,6 +13,9 @@ class UserController extends Controller
 
     public $layout = false;
 
+    /**
+     * @return string
+     */
     public function actionIndex()
     {
 
@@ -23,6 +26,9 @@ class UserController extends Controller
         ]);
     }
 
+    /**
+     * @return \yii\web\Response
+     */
     public function actionLoginOut()
     {
         //统一清除session

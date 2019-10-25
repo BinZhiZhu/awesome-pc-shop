@@ -8,6 +8,11 @@ use yii\helpers\Url;
 use yii\web\Controller;
 use Yii;
 
+/**
+ * Class AdminController
+ *
+ * @package app\controllers
+ */
 class AdminController extends Controller
 {
     /**

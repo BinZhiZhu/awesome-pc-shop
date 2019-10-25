@@ -12,6 +12,9 @@ use Yii;
 class PcController extends Controller
 {
 
+    /**
+     * @return string
+     */
     public function actionIndex()
     {
         Yii::$app->view->title = '花卉线上体验店';
