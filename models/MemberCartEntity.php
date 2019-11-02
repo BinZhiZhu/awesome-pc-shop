@@ -67,6 +67,7 @@ class MemberCartEntity extends \yii\db\ActiveRecord
             'id'=>$this->id,
             'title'=> $this->goodsEntity->title,
             'total'=>"{$this->total}/件",
+            'num'=>$this->total,
             'goods_id'=>$this->goods_id,
             'price'=>"￥{$this->market_price}"
         ];

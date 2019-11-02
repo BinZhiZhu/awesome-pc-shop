@@ -69,12 +69,22 @@ class MemberController extends Controller
             ]);
         }
 
-        $cart = new MemberCartEntity();
-        $cart->created_at = time();
-        $cart->goods_id = $goods->id;
-        $cart->total = $total;
-        $cart->member_id = $member->id;
-        $cart->market_price = $goods->price;
+        $cart = MemberCartEntity::findOne([
+            'member_id' => $member->id,
+            'goods_id' => $goods->id
+        ]);
+
+        if ($cart) {
+            $cart->total += $total;
+        } else {
+            $cart = new MemberCartEntity();
+            $cart->created_at = time();
+            $cart->goods_id = $goods->id;
+            $cart->total = $total;
+            $cart->member_id = $member->id;
+            $cart->market_price = $goods->price;
+
+        }
 
         Yii::$app->getDb()->transaction(function () use ($cart) {
             $cart->save(false);
@@ -227,6 +237,49 @@ class MemberController extends Controller
             ]);
         }
 
+    }
+
+    /**
+     * 更新购物车
+     *
+     * @return object
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function actionUpdateCart()
+    {
+        $cart_id = Yii::$app->request->post('id');
+        $total = Yii::$app->request->post('total');
+
+        $cart_id = intval($cart_id);
+        $total = intval($total);
+        $cart = MemberCartEntity::findOne([
+            'id' => $cart_id
+        ]);
+
+        if (!$cart) {
+            return Yii::createObject([
+                'class' => 'yii\web\Response',
+                'format' => \yii\web\Response::FORMAT_JSON,
+                'data' => [
+                    'code' => -100,
+                    'message' => '找不到购物车记录',
+                    'result' => []
+                ]
+            ]);
+        }
+
+        $cart->total = $total;
+        $cart->save(false);
+
+        return Yii::createObject([
+            'class' => 'yii\web\Response',
+            'format' => \yii\web\Response::FORMAT_JSON,
+            'data' => [
+                'code' => 200,
+                'message' => '更新成功',
+                'result' => $cart
+            ]
+        ]);
     }
 
 }

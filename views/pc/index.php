@@ -231,6 +231,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                         <div class="link-balance__left">
                             <el-button type="text" @click="">一起逛逛鲜花网</el-button>
                             <el-button type="text" @click="dialogVisible = true">联系我们</el-button>
+                            <el-button type="text" @click="loginAdmin">登录后台</el-button>
 
                             <el-dialog
                                     title="客服信息"
@@ -476,9 +477,9 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                                             align="center"
                                     >
                                         <template slot-scope="scope">
-                                            <!--                                            <el-button-->
-                                            <!--                                                    size="mini"-->
-                                            <!--                                                    @click="handleEdit(scope.$index, scope.row)">编辑</el-button>-->
+                                            <el-button
+                                                size="mini"
+                                                @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
                                             <el-button
                                                     size="mini"
                                                     type="danger"
@@ -493,6 +494,22 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                                 </div>
                             </template>
                         </el-drawer>
+                        <el-dialog
+                                title="购物车信息"
+                                :visible.sync="cartDialogVisible"
+                                width="30%"
+                                center>
+                            <div>商品标题: {{chooseCartGoods.title}}</div>
+                            <div>商品价格: <span style="color: red">{{chooseCartGoods.price}}</span></div>
+                            <div>购买数量:
+                                &nbsp&nbsp&nbsp
+                                <el-input-number v-model="chooseCartGoods.num" size="small" @change="handleChange" :min="1" :max="10"
+                                                 label=""></el-input-number>
+                            </div>
+                            <span slot="footer" class="dialog-footer">
+                           <el-button type="primary" @click="updateCartGoods(chooseCartGoods.id)">保存</el-button>
+                 </span>
+                        </el-dialog>
                         <el-drawer
                                 title="我的订单"
                                 size="60%"
@@ -599,6 +616,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                     }
                 };
                 return {
+                    chooseCartGoods: {},
                     is_delete_all: false,
                     is_show_order: false,
                     orderList: [],
@@ -622,6 +640,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                     imageUrl: '',
                     direction: 'rtl',
                     is_show_cart: false,
+                    cartDialogVisible: false,
                     dialogVisible: false,
                     centerDialogVisible: false,
                     dialogRegisterVisible: false,
@@ -693,6 +712,33 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                 this.getGoodsCategoryList()
             },
             methods: {
+                //更新购物车
+                updateCartGoods(){
+                    let url = '<?php echo \yii\helpers\Url::toRoute('member/update-cart');?>';
+                    let param = new URLSearchParams();
+                    param.append('id', this.chooseCartGoods.id);
+                    param.append('total', this.num);
+                    axios.post(url, param)
+                        .then(response => {
+                            const resp = response.data;
+                            console.log('更新购物车结果', resp);
+                            if (resp.code === 200) {
+                                this.$message.success(resp.message);
+                                this.cartDialogVisible = false
+                                this.getMyCartList()
+                            } else {
+                                this.$message.success(resp.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        });
+                },
+                //跳转后台
+                loginAdmin() {
+                    let url = '<?php echo \yii\helpers\Url::toRoute('user/index');?>';
+                    window.location.href = url
+                },
                 myOrder() {
                     this.getMyOrderList();
                     this.is_show_order = true
@@ -747,6 +793,8 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                 },
                 handleEdit(index, row) {
                     console.log(index, row);
+                    this.cartDialogVisible = true
+                    this.chooseCartGoods = row
                 },
                 handleDelete(index, row) {
                     console.log(index, row);
