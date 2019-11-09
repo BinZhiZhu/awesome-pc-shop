@@ -34,7 +34,20 @@ class MemberController extends Controller
 
         $session = Yii::$app->session;
         $array = $session['is_app_user_id'];
+
+        if (!isset($array) || !$array) {
+            return Yii::createObject([
+                'class' => 'yii\web\Response',
+                'format' => \yii\web\Response::FORMAT_JSON,
+                'data' => [
+                    'code' => -100,
+                    'message' => '用户不存在',
+                    'result' => []
+                ]
+            ]);
+        }
         $user_id = $array['value'];
+
 
         $member = AppUsers::findOne([
             'id' => $user_id

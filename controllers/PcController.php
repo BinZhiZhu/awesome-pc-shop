@@ -287,10 +287,10 @@ class PcController extends Controller
         $userId = $session->get('is_app_user_id');
 
         $user = AppUsers::findOne([
-            'id'=>$userId
+            'id' => $userId
         ]);
 
-        if(!$user){
+        if (!$user) {
             return Yii::createObject([
                 'class' => 'yii\web\Response',
                 'format' => \yii\web\Response::FORMAT_JSON,
@@ -351,7 +351,7 @@ class PcController extends Controller
                 // 将用户上传的文件保存到 upload 目录中
                 if (move_uploaded_file($file['tmp_name'], $destination)) {
 
-                    $url = Yii::$app->request->getHostInfo() . $base_dir . $base_time.'_'.$file['name'];
+                    $url = Yii::$app->request->getHostInfo() . $base_dir . $base_time . '_' . $file['name'];
 
                     $baseFile = new BaseFile();
                     $baseFile->url = trim($url);
@@ -368,7 +368,7 @@ class PcController extends Controller
                             'code' => 200,
                             'result' => [
                                 'url' => $url,
-                                'file_name'=>$file['name']
+                                'file_name' => $file['name']
                             ]
                         ]
                     ]);

@@ -17,6 +17,8 @@ use Yii;
  * @property GoodsEntity goodsEntity
  * @property int goods_id
  * @property int is_deleted
+ * @property int merchant_id 商家ID
+ * @property int updated_by 更新人ID
  */
 class OrderEntity extends \yii\db\ActiveRecord
 {
@@ -34,7 +36,7 @@ class OrderEntity extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['member_id', 'status', 'created_at', 'total','goods_id','is_deleted'], 'integer'],
+            [['member_id', 'status', 'created_at', 'total','goods_id','is_deleted','merchant_id','updated_by'], 'integer'],
             [['price'], 'number'],
             [['order_sn'], 'string', 'max' => 255],
         ];
@@ -54,7 +56,9 @@ class OrderEntity extends \yii\db\ActiveRecord
             'total' => 'total',
             'created_at' => 'Created At',
             'goods_id'=>'goods_id',
-            'is_deleted'=>'is_deleted'
+            'is_deleted'=>'is_deleted',
+            'merchant_id'=>'merchant_id',
+            'updated_by'=>'updated_by'
         ];
     }
 
@@ -77,7 +81,9 @@ class OrderEntity extends \yii\db\ActiveRecord
             'title' => $this->goodsEntity->title,
             'total' => "{$this->total}/件",
             'created_at' => date("Y-m-d H:i:s", $this->created_at),
-            'created_by'=>$this->goodsEntity->memberEntity->username
+            'created_by'=>$this->goodsEntity->memberEntity->username,
+            'merchant_id'=>$this->merchant_id,
+            'updated_by'=>$this->updated_by,
         ];
 
     }

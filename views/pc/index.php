@@ -842,10 +842,15 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                     axios.post(url, param)
                         .then(response => {
                             const resp = response.data;
-                            console.log('加入购物车结果', resp);
-                            this.$message.success('加入成功');
-                            this.centerDialogVisible = false
-                            this.num = 1;
+                            if(resp.code === 200){
+                                console.log('加入购物车结果', resp);
+                                this.$message.success('加入成功');
+                                this.centerDialogVisible = false
+                                this.num = 1;
+                            }else{
+                                this.$message.error(resp.message)
+                                return
+                            }
                         })
                         .catch(error => {
                             console.log(error)
@@ -868,7 +873,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                                 this.getGoodsList()
                                 this.getGoodsCategoryList()
                             } else {
-                                this.$message.success(resp.message);
+                                this.$message.error(resp.message);
                                 //刷新一下数据 更新库存
                             }
                         })

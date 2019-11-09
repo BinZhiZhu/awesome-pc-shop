@@ -111,6 +111,12 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                         <dd><a href="<?php echo \yii\helpers\Url::to(['goods/list'])?>" target="mainFrame">商品列表</a></dd>
                     </dl>
                 </li>
+                    <li class="layui-nav-item">
+                        <a href="javascript:;">订单管理</a>
+                        <dl class="layui-nav-child">
+                            <dd><a href="<?php echo \yii\helpers\Url::to(['order/merchant'])?>" target="mainFrame">订单列表</a></dd>
+                        </dl>
+                    </li>
             <?php } ?>
                 <li class="layui-nav-item"><a href="">帮助</a></li>
                 <li class="layui-nav-item"><a href="">关于我们</a></li>

@@ -32,9 +32,24 @@ class OrderController extends Controller
         return $orderSn;
     }
 
+    /**
+     * 渲染管理员订单列表
+     *
+     * @return string
+     */
     public function actionList()
     {
         return $this->render('list');
+    }
+
+    /**
+     * 渲染商家订单列表
+     *
+     * @return string
+     */
+    public function actionMerchant()
+    {
+        return $this->render('merchant');
     }
 
     /**
@@ -125,6 +140,7 @@ class OrderController extends Controller
             $order->total = $total;
             $order->goods_id = $goods_id;
             $order->status = StatusTypeEnum::ON;
+            $order->merchant_id = $goods->created_by; //把商家改商品的商家的ID记录起来，方便后面查询商家的订单列表
 
             Yii::$app->getDb()->transaction(function () use ($order, $goods) {
 
@@ -296,8 +312,7 @@ class OrderController extends Controller
 
         $member = DevUsers::findOne([
             'id' => $user_id,
-            'role' => RoleTypeEnum::ADMIN
-
+//            'role' => RoleTypeEnum::ADMIN
         ]);
 
         if (!$member) {
@@ -311,7 +326,6 @@ class OrderController extends Controller
                 ]
             ]);
         }
-
 
         $order = OrderEntity::findOne([
             'id' => $order_id
@@ -329,6 +343,7 @@ class OrderController extends Controller
             ]);
         }
 
+        $order->updated_by = intval($user_id);
         $order->is_deleted = StatusTypeEnum::ON;
         $order->save(false);
 
@@ -344,5 +359,65 @@ class OrderController extends Controller
 
     }
 
+    /**
+     * 获取商家的订单列表
+     *
+     * @return object
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function actionGetMerchantOrderList()
+    {
+        $session = Yii::$app->session;
+        $array = $session['is_user_id'];
+        $user_id = $array['value'];
+
+        //确保后台用户是商家身份
+        $member = DevUsers::findOne([
+            'id' => $user_id,
+            'role' => RoleTypeEnum::MERCHANT
+        ]);
+
+        if (!$member) {
+            return Yii::createObject([
+                'class' => 'yii\web\Response',
+                'format' => \yii\web\Response::FORMAT_JSON,
+                'data' => [
+                    'code' => -100,
+                    'message' => '用户不存在',
+                    'result' => []
+                ]
+            ]);
+        }
+
+        $list = OrderEntity::find()
+            ->where([
+                'status' => StatusTypeEnum::ON,
+                'is_deleted' => StatusTypeEnum::OFF
+            ])
+            ->andWhere([
+                'merchant_id' => $user_id
+            ])
+            ->orderBy(['id' => SORT_DESC])
+            ->all();
+
+
+        /** @var OrderEntity $item */
+        foreach ($list as &$item) {
+            $item = $item->getApiArray();
+        }
+        unset($item);
+
+        return Yii::createObject([
+            'class' => 'yii\web\Response',
+            'format' => \yii\web\Response::FORMAT_JSON,
+            'data' => [
+                'code' => 200,
+                'result' => [
+                    'list' => $list,
+                    'total' => count($list)
+                ]
+            ]
+        ]);
+    }
 
 }
