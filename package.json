@@ -19,12 +19,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/BinZhiZhu/admin.binzhizhu.top.git"
+    "url": "https://github.com/BinZhiZhu/awesome-shop.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/BinZhiZhu/admin.binzhizhu.top/issues"
+    "url": "https://github.com/BinZhiZhu/awesome-shop.git/issues"
   },
-  "homepage": "https://github.com/BinZhiZhu/admin.binzhizhu.top#readme"
+  "homepage": "https://github.com/BinZhiZhu/awesome-shop.git#readme"
 }
