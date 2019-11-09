@@ -665,5 +665,59 @@ class MemberController extends Controller
         ]);
     }
 
+    /**
+     * 获取商品评价信息
+     * @throws InvalidConfigException
+     */
+    public function actionGetGoodsCommentList()
+    {
 
+        $goods_id = Yii::$app->request->post('goods_id');
+        $goods_id = intval($goods_id);
+
+        $goods = GoodsEntity::findOne([
+            'id'=>$goods_id
+        ]);
+
+        if(!$goods){
+            return Yii::createObject([
+                'class' => 'yii\web\Response',
+                'format' => \yii\web\Response::FORMAT_JSON,
+                'data' => [
+                    'code' => -200,
+                    'message' => '商品不存在',
+                    'result' => []
+                ]
+            ]);
+        }
+
+
+
+        //拉取当前商品的所有的评价记录
+        $list = GoodsComment::find()
+            ->where(['goods_id'=>$goods_id])
+            ->orderBy(['created_at'=>SORT_ASC])
+//            ->asArray()
+            ->all();
+
+        /** @var GoodsComment $item */
+        foreach ($list as &$item){
+            $item = $item->getApiArray();
+        }
+        unset($item);
+
+        return Yii::createObject([
+            'class' => 'yii\web\Response',
+            'format' => \yii\web\Response::FORMAT_JSON,
+            'data' => [
+                'code' => 200,
+                'message' => '',
+                'result' => [
+                    'count'=>count($list),
+                    'list'=> $list
+                ]
+            ]
+        ]);
+
+    }
 }

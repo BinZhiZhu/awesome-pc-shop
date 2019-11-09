@@ -466,13 +466,40 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                         </span>
                         </el-dialog>
 
+
 <!--                        商品评论抽屉-->
                         <el-drawer
                                 title="商品评价"
+                                size="50%"
                                 :visible.sync="goodsInfoDrawer"
                                 :direction="direction"
                                 :before-close="handleClose">
-                            <span>我来啦!</span>
+                            <template>
+                                <el-table
+                                        :data="commentList"
+                                        tooltip-effect="dark"
+                                        style="width: 100%"
+                                     >
+                                    <el-table-column
+                                            align="center"
+                                            prop="nickname"
+                                            label="评价用户"
+                                    >
+                                    </el-table-column>
+                                    <el-table-column
+                                            align="center"
+                                            prop="content"
+                                            label="评价内容"
+                                    >
+                                    </el-table-column>
+                                    <el-table-column
+                                            align="center"
+                                            prop="create_time"
+                                            label="评价时间"
+                                            show-overflow-tooltip>
+                                    </el-table-column>
+                                </el-table>
+                            </template>
                         </el-drawer>
 
                         <el-drawer
@@ -756,7 +783,8 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                         'http://5b0988e595225.cdn.sohucs.com/images/20180103/d78d9fd7150543cbb5821a3c3b008294.jpeg'
                     ],
                     goodsList: [],
-                    goodsCategoryList: []
+                    goodsCategoryList: [],
+                    commentList: []
                 };
             },
             created: function () {
@@ -805,6 +833,24 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                 //商品评价抽屉
                 scanGoodsComment(){
                     this.goodsInfoDrawer = true
+                    let url = '<?php echo \yii\helpers\Url::toRoute('member/get-goods-comment-list');?>';
+                    let param = new URLSearchParams();
+                    param.append('goods_id', this.chooseGoods.id);
+                    axios.post(url, param)
+                        .then(response => {
+                            const resp = response.data;
+                            console.log('获取商品评价列表结果', resp);
+                            if (resp.code === 200) {
+                                //TODO 渲染数据
+                                console.log('评价列表',resp.result.list)
+                                this.commentList = resp.result.list
+                            } else {
+                                this.$message.error(resp.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        });
                 },
                 //更新购物车
                 updateCartGoods() {

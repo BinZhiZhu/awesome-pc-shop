@@ -55,7 +55,7 @@ class GoodsComment extends \yii\db\ActiveRecord implements AdminArrayInterface
      */
     public function getMemberEntity()
     {
-        return $this->hasOne(AppUsers::className(),['id'=>'member_id']);
+        return $this->hasOne(AppUsers::className(), ['id' => 'member_id']);
     }
 
     /**
@@ -64,5 +64,18 @@ class GoodsComment extends \yii\db\ActiveRecord implements AdminArrayInterface
     public function getAdminArray()
     {
         // TODO: Implement getAdminArray() method.
+    }
+
+    public function getApiArray()
+    {
+        $result = [];
+
+        $result['id'] = $this->id;
+        $result['member'] = $this->memberEntity;
+        $result['nickname'] = $this->memberEntity->username;
+        $result['create_time'] = date("Y-m-d", $this->created_at);
+        $result['content'] = $this->content;
+
+        return $result;
     }
 }
