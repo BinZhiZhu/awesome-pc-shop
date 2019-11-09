@@ -331,7 +331,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                         >
                             <el-form :model="userForm" :rules="userRules" ref="userForm">
                                 <el-form-item label="头像" :label-width="formLabelWidth" prop="avatar">
-<!--                                    上传太慢导致超时 action="https://jsonplaceholder.typicode.com/posts/"-->
+                                    <!--                                    上传太慢导致超时 action="https://jsonplaceholder.typicode.com/posts/"-->
                                     <el-upload
                                             class="avatar-uploader"
                                             action="https://www.mocky.io/v2/5185415ba171ea3a00704eed"
@@ -479,8 +479,9 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                                     >
                                         <template slot-scope="scope">
                                             <el-button
-                                                size="mini"
-                                                @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                                                    size="mini"
+                                                    @click="handleEdit(scope.$index, scope.row)">编辑
+                                            </el-button>
                                             <el-button
                                                     size="mini"
                                                     type="danger"
@@ -490,7 +491,8 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                                     </el-table-column>
                                 </el-table>
                                 <div style="margin-top: 20px;margin-left: 20px">
-                                    <el-button @click="deleteAllCart" v-if="is_delete_all" type="primary">全部删除</el-button>
+                                    <el-button @click="deleteAllCart" v-if="is_delete_all" type="primary">全部删除
+                                    </el-button>
                                     <el-button @click="payOrderFromCart" v-if="is_pay" type="primary">立即结算</el-button>
                                 </div>
                             </template>
@@ -504,7 +506,8 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                             <div>商品价格: <span style="color: red">{{chooseCartGoods.price}}</span></div>
                             <div>购买数量:
                                 &nbsp&nbsp&nbsp
-                                <el-input-number v-model="chooseCartGoods.num" size="small" @change="handleChange" :min="1" :max="1000"
+                                <el-input-number v-model="chooseCartGoods.num" size="small" @change="handleChange"
+                                                 :min="1" :max="1000"
                                                  label=""></el-input-number>
                             </div>
                             <span slot="footer" class="dialog-footer">
@@ -715,7 +718,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
             },
             methods: {
                 //更新购物车
-                updateCartGoods(){
+                updateCartGoods() {
                     let url = '<?php echo \yii\helpers\Url::toRoute('member/update-cart');?>';
                     let param = new URLSearchParams();
                     param.append('id', this.chooseCartGoods.id);
@@ -758,7 +761,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                         });
                 },
                 //购物车结算
-                payOrderFromCart(){
+                payOrderFromCart() {
                     let categoryIds = [];
                     this.multipleSelection.map((item, index) => {
                         categoryIds.push(item.id);
@@ -872,12 +875,12 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                     axios.post(url, param)
                         .then(response => {
                             const resp = response.data;
-                            if(resp.code === 200){
+                            if (resp.code === 200) {
                                 console.log('加入购物车结果', resp);
                                 this.$message.success('加入成功');
                                 this.centerDialogVisible = false
                                 this.num = 1;
-                            }else{
+                            } else {
                                 this.$message.error(resp.message)
                                 return
                             }
@@ -912,7 +915,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                         });
                 },
                 //根据商品ID去获取商品详情
-                getGoodsDetailByGoodsId(id){
+                getGoodsDetailByGoodsId(id) {
                     let url = '<?php echo \yii\helpers\Url::toRoute('goods/get-goods-detail');?>';
                     let param = new URLSearchParams();
                     param.append('id', id);
@@ -1216,9 +1219,9 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                 },
                 //重置表单 移除校验结果
                 resetForm(formName) {
-                    console.log('resetForm',formName)
-                    console.log('当前表单绑定的值',this.userForm)
-                    console.log('当前用户信息表单绑定的信息是',this.user)
+                    console.log('resetForm', formName)
+                    console.log('当前表单绑定的值', this.userForm)
+                    console.log('当前用户信息表单绑定的信息是', this.user)
                     this.user.mobile = ''
                     this.user.email = ''
                     this.user.address = ''
