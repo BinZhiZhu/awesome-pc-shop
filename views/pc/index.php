@@ -1216,6 +1216,12 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                 },
                 //重置表单 移除校验结果
                 resetForm(formName) {
+                    console.log('resetForm',formName)
+                    console.log('当前表单绑定的值',this.userForm)
+                    console.log('当前用户信息表单绑定的信息是',this.user)
+                    this.user.mobile = ''
+                    this.user.email = ''
+                    this.user.address = ''
                     this.$refs[formName].resetFields();
                 }
             }
