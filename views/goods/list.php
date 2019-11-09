@@ -82,8 +82,8 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
     }
 
     .avatar-uploader .el-upload {
-        width: 178px;
-        height: 178px;
+        width: 120px;
+        height: 120px;
         border: 1px dashed #d9d9d9;
         border-radius: 6px;
         cursor: pointer;

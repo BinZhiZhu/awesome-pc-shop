@@ -331,9 +331,10 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                         >
                             <el-form :model="userForm" :rules="userRules" ref="userForm">
                                 <el-form-item label="头像" :label-width="formLabelWidth" prop="avatar">
+<!--                                    上传太慢导致超时 action="https://jsonplaceholder.typicode.com/posts/"-->
                                     <el-upload
                                             class="avatar-uploader"
-                                            action="https://jsonplaceholder.typicode.com/posts/"
+                                            action="https://www.mocky.io/v2/5185415ba171ea3a00704eed"
                                             :show-file-list="false"
                                             auto-upload
                                             :on-success="handleAvatarSuccess"
