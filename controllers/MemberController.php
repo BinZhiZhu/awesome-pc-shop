@@ -5,10 +5,12 @@ namespace app\controllers;
 use app\common\Helper;
 use app\enums\StatusTypeEnum;
 use app\models\AppUsers;
+use app\models\GoodsComment;
 use app\models\GoodsEntity;
 use app\models\MemberCartEntity;
 use app\models\OrderEntity;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\web\Controller;
 
 /**
@@ -23,7 +25,7 @@ class MemberController extends Controller
      * 加入购物车
      *
      * @return object
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      * @throws \Throwable
      */
     public function actionAddCart()
@@ -87,7 +89,7 @@ class MemberController extends Controller
         $cart = MemberCartEntity::findOne([
             'member_id' => $member->id,
             'goods_id' => $goods->id,
-            'is_deleted'=>StatusTypeEnum::OFF
+            'is_deleted' => StatusTypeEnum::OFF
         ]);
 
         if ($cart) {
@@ -124,7 +126,7 @@ class MemberController extends Controller
      * 查看我的购物车列表
      *
      * @return object
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function actionMyCartList()
     {
@@ -180,7 +182,7 @@ class MemberController extends Controller
      * 移除购物车
      *
      * @return object
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function actionDeleteCart()
     {
@@ -259,7 +261,7 @@ class MemberController extends Controller
      * 更新购物车
      *
      * @return object
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function actionUpdateCart()
     {
@@ -303,7 +305,7 @@ class MemberController extends Controller
      *  从购物车结算
      *
      * @return object
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      * @throws \Throwable
      * @package 用户模块
      */
@@ -588,6 +590,79 @@ class MemberController extends Controller
 
 
         }
+    }
+
+
+    /**
+     * 发表商品评价
+     * @return object
+     * @throws InvalidConfigException
+     * @throws \Throwable
+     */
+    public function actionPublishGoodsComment()
+    {
+        //检验是否登录?
+        $session = Yii::$app->session;
+        $sessionData = $session['is_app_user_id'];
+        $userId = $sessionData['value'];
+
+        if (!$userId) {
+            return Yii::createObject([
+                'class' => 'yii\web\Response',
+                'format' => \yii\web\Response::FORMAT_JSON,
+                'data' => [
+                    'code' => -100,
+                    'message' => '请先登录哦',
+                    'result' => []
+                ]
+            ]);
+        }
+
+        $goods_id = Yii::$app->request->post('goods_id');
+        $content = Yii::$app->request->post('content');
+        $goods_id = intval($goods_id);
+        $content = trim($content);
+
+        $goods = GoodsEntity::findOne([
+            'id' => $goods_id
+        ]);
+
+        if (!$goods) {
+            return Yii::createObject([
+                'class' => 'yii\web\Response',
+                'format' => \yii\web\Response::FORMAT_JSON,
+                'data' => [
+                    'code' => -100,
+                    'message' => '找不到商品',
+                    'result' => []
+                ]
+            ]);
+        }
+
+        //存评价记录
+        $model = new GoodsComment();
+        $model->goods_id = $goods_id;
+        $model->member_id = $userId;
+        $model->created_at = time();
+        $model->content = $content;
+
+        Yii::$app->getDb()->transaction(function () use ($model) {
+
+            $model->save(false);
+        });
+
+        return Yii::createObject([
+            'class' => 'yii\web\Response',
+            'format' => \yii\web\Response::FORMAT_JSON,
+            'data' => [
+                'code' => 200,
+                'message' => '评价成功~',
+                'result' => [
+                    'goods_id' => $goods->id,
+                    'comment_id' => $model->id
+                ]
+            ]
+        ]);
     }
 
 

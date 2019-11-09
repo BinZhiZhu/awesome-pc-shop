@@ -217,6 +217,11 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
         .empty-goods-text {
             padding-left: 500px;
         }
+        .el-drawer__body{
+            overflow-y: scroll;
+            padding-top: 10px;
+            padding-bottom: 40px;
+        }
     </style>
     <div id="app">
         <!--    首页容器布局-->
@@ -433,10 +438,43 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                                                  label=""></el-input-number>
                             </div>
                             <span slot="footer" class="dialog-footer">
-                           <el-button type="primary" @click="addToCart(chooseGoods.id)">加入购物车</el-button>
-                          <el-button type="primary" @click="buyNow(chooseGoods.id)">立即购买</el-button>
+                              <el-button type="success" @click="publishComment" size="small">发布评价</el-button>
+                            <el-button type="success" @click="scanGoodsComment" size="small">查看评价</el-button>
+                           <el-button type="primary" @click="addToCart(chooseGoods.id)" size="small">加入购物车</el-button>
+                          <el-button type="primary" @click="buyNow(chooseGoods.id)" size="small" >立即购买</el-button>
                  </span>
                         </el-dialog>
+
+<!--                        发布评价-->
+                        <el-dialog
+                                title="发布评价"
+                                :visible.sync="dialogPublishCommentVisible"
+                                width="30%"
+                                center
+                                :before-close="handleClose"
+                        >
+                            <el-form :model="commentForm" ref="form">
+                                <el-form-item label="评价内容:">
+                                    <el-input type="textarea" v-model="commentForm.content"></el-input>
+                                </el-form-item>
+                            </el-form>
+                            <span slot="footer" class="dialog-footer">
+                          <el-tooltip class="item" effect="dark" :content="loginTip" placement="bottom">
+                                    <el-button type="primary" @click="publishGoodsComment">发表</el-button>
+                                </el-tooltip>
+                                <el-button @click="handleClose">取消</el-button>
+                        </span>
+                        </el-dialog>
+
+<!--                        商品评论抽屉-->
+                        <el-drawer
+                                title="商品评价"
+                                :visible.sync="goodsInfoDrawer"
+                                :direction="direction"
+                                :before-close="handleClose">
+                            <span>我来啦!</span>
+                        </el-drawer>
+
                         <el-drawer
                                 title="我的购物车"
                                 size="50%"
@@ -514,51 +552,56 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                            <el-button type="primary" @click="updateCartGoods(chooseCartGoods.id)">保存</el-button>
                  </span>
                         </el-dialog>
-                        <el-drawer
-                                title="我的订单"
-                                size="60%"
-                                :visible.sync="is_show_order"
-                                :direction="direction"
+<!--                        我的订单抽屉-->
+                        <div
+                            class="order-list-drawer"
                         >
-                            <template>
-                                <el-table
-                                        :data="orderList"
-                                        tooltip-effect="dark"
-                                        style="width: 100%"
-                                >
-                                    <el-table-column
-                                            align="center"
-                                            prop="order_sn"
-                                            label="订单号"
+                            <el-drawer
+                                    title="我的订单"
+                                    size="60%"
+                                    :visible.sync="is_show_order"
+                                    :direction="direction"
+                            >
+                                <template>
+                                    <el-table
+                                            :data="orderList"
+                                            tooltip-effect="dark"
+                                            style="width: 100%"
                                     >
-                                    </el-table-column>
-                                    <el-table-column
-                                            align="center"
-                                            prop="title"
-                                            label="商品名称"
-                                    >
-                                    </el-table-column>
-                                    <el-table-column
-                                            align="center"
-                                            prop="total"
-                                            label="商品数量(单位/件)"
-                                    >
-                                    </el-table-column>
-                                    <el-table-column
-                                            align="center"
-                                            prop="order_price"
-                                            label="订单价格(单位/元)"
-                                            show-overflow-tooltip>
-                                    </el-table-column>
-                                    <el-table-column
-                                            align="center"
-                                            prop="created_at"
-                                            label="下单时间"
-                                            show-overflow-tooltip>
-                                    </el-table-column>
-                                </el-table>
-                            </template>
-                        </el-drawer>
+                                        <el-table-column
+                                                align="center"
+                                                prop="order_sn"
+                                                label="订单号"
+                                        >
+                                        </el-table-column>
+                                        <el-table-column
+                                                align="center"
+                                                prop="title"
+                                                label="商品名称"
+                                        >
+                                        </el-table-column>
+                                        <el-table-column
+                                                align="center"
+                                                prop="total"
+                                                label="商品数量(单位/件)"
+                                        >
+                                        </el-table-column>
+                                        <el-table-column
+                                                align="center"
+                                                prop="order_price"
+                                                label="订单价格(单位/元)"
+                                                show-overflow-tooltip>
+                                        </el-table-column>
+                                        <el-table-column
+                                                align="center"
+                                                prop="created_at"
+                                                label="下单时间"
+                                                show-overflow-tooltip>
+                                        </el-table-column>
+                                    </el-table>
+                                </template>
+                            </el-drawer>
+                        </div>
                     </el-main>
                     <el-footer>
                         花礼网 （中国鲜花礼品网） xxxxx版权 中国鲜花网领先品牌，鲜花速递专家！
@@ -642,11 +685,16 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                             label: '女'
                         }
                     ],
+                    commentForm: {
+                        content: ''
+                    },
                     imageUrl: '',
                     direction: 'rtl',
+                    goodsInfoDrawer: false,
                     is_show_cart: false,
                     cartDialogVisible: false,
                     dialogVisible: false,
+                    dialogPublishCommentVisible: false,
                     centerDialogVisible: false,
                     dialogRegisterVisible: false,
                     dialogLoginVisible: false,
@@ -717,6 +765,47 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                 this.getGoodsCategoryList()
             },
             methods: {
+                // 发表评价
+                publishGoodsComment(){
+                    console.log('当前商品',this.chooseGoods)
+                    const goodsId = this.chooseGoods.id
+                    const content = this.commentForm.content
+                    if(!goodsId){
+                        this.$message.error("参数错误")
+                        return
+                    }
+                    if(!content){
+                        this.$message.error("商品评价不能为空哦~")
+                        return
+                    }
+                    console.log('评价内容',content)
+                    let url = '<?php echo \yii\helpers\Url::toRoute('member/publish-goods-comment');?>';
+                    let param = new URLSearchParams();
+                    param.append('goods_id', goodsId);
+                    param.append('content',content);
+                    axios.post(url, param)
+                        .then(response => {
+                            const resp = response.data;
+                            console.log('发表评价结果', resp);
+                            if (resp.code === 200) {
+                                this.$message.success(resp.message);
+                                this.dialogPublishCommentVisible = false
+                            } else {
+                                this.$message.error(resp.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        });
+                },
+                //点击发布评价按钮
+                publishComment(){
+                    this.dialogPublishCommentVisible = true
+                },
+                //商品评价抽屉
+                scanGoodsComment(){
+                    this.goodsInfoDrawer = true
+                },
                 //更新购物车
                 updateCartGoods() {
                     let url = '<?php echo \yii\helpers\Url::toRoute('member/update-cart');?>';
@@ -841,7 +930,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                                 this.$message.success(resp.message);
                                 this.is_show_cart = false
                             } else {
-                                this.$message.success(resp.message);
+                                this.$message.error(resp.message);
                             }
                         })
                         .catch(error => {
@@ -1072,10 +1161,13 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                     });
                 },
                 handleClose(done) {
+                    console.log(done)
                     this.dialogRegisterVisible = false
                     this.dialogLoginVisible = false
                     this.dialogUserInfoVisible = false
-                },
+                    this.goodsInfoDrawer = false
+                    this.dialogPublishCommentVisible = false
+                    },
                 alertMessage(msg, close, type) {
                     this.$message({
                         showClose: close,
