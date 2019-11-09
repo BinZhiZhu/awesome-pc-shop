@@ -2,12 +2,15 @@
 
 namespace app\common;
 
-use app\models\DevUsers;
 use Yii;
 use yii\base\Security;
 
 class Helper
 {
+    /**
+     * @param $url
+     * @return bool|string
+     */
     public static function requestApi($url)
     {
         if(empty($url)){
@@ -22,6 +25,11 @@ class Helper
 
     }
 
+    /**
+     * @param $value
+     * @param $array
+     * @return bool
+     */
     public static function deep_array($value, $array)
     {
         foreach ($array as $item) {
@@ -40,6 +48,11 @@ class Helper
         return false;
     }
 
+    /**
+     * @param $table_name
+     * @return bool
+     * @throws \yii\db\Exception
+     */
     public static function tableExists($table_name)
     {
         $table_name = trim($table_name);
@@ -54,6 +67,9 @@ class Helper
 
     }
 
+    /**
+     *
+     */
     /**
      * @param $length
      * @param bool $numeric
@@ -74,5 +90,17 @@ class Helper
             $hash .= $seed{mt_rand(0, $max)};
         }
         return $hash;
+    }
+
+    /**
+     * 生成订单号
+     *
+     * @return string
+     */
+    public static function generateOrderSn()
+    {
+        $yCode = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J');
+        $orderSn = $yCode[intval(date('Y')) - 2011] . strtoupper(dechex(date('m'))) . date('d') . substr(time(), -5) . substr(microtime(), 2, 5) . sprintf('%02d', rand(0, 99));
+        return $orderSn;
     }
 }

@@ -490,8 +490,8 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                                     </el-table-column>
                                 </el-table>
                                 <div style="margin-top: 20px;margin-left: 20px">
-                                    <el-button @click="deleteAllCart" v-if="is_delete_all" type="primary">全部删除
-                                    </el-button>
+                                    <el-button @click="deleteAllCart" v-if="is_delete_all" type="primary">全部删除</el-button>
+                                    <el-button @click="payOrderFromCart" v-if="is_pay" type="primary">立即结算</el-button>
                                 </div>
                             </template>
                         </el-drawer>
@@ -620,6 +620,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                     chooseCartGoods: {},
                     is_delete_all: false,
                     is_show_order: false,
+                    is_pay: false,
                     orderList: [],
                     cartList: [],
                     multipleSelection: [],
@@ -756,6 +757,33 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                             console.log(error)
                         });
                 },
+                //购物车结算
+                payOrderFromCart(){
+                    let categoryIds = [];
+                    this.multipleSelection.map((item, index) => {
+                        categoryIds.push(item.id);
+                    })
+                    console.log('选择的购物车IDS', categoryIds)
+                    let url = '<?php echo \yii\helpers\Url::toRoute('member/pay-order-from-cart');?>';
+                    let param = new URLSearchParams();
+                    param.append('cart_id', categoryIds);
+                    axios.post(url, param)
+                        .then(response => {
+                            const resp = response.data;
+                            console.log('购物车立即结算结果', resp);
+                            if (resp.code === 200) {
+                                this.$message.success(resp.message);
+                                this.is_pay = false
+                                this.is_show_cart = false
+                            } else {
+                                this.$message.error(resp.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        });
+                },
+                //从购物车删除
                 deleteAllCart() {
                     let categoryIds = [];
                     this.multipleSelection.map((item, index) => {
@@ -773,7 +801,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                                 this.$message.success(resp.message);
                                 this.is_show_cart = false
                             } else {
-                                this.$message.success(resp.message);
+                                this.$message.error(resp.message);
                             }
                         })
                         .catch(error => {
@@ -820,9 +848,11 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                 handleSelectionChange(val) {
                     this.multipleSelection = val;
                     if (this.multipleSelection.length > 0) {
-                        this.is_delete_all = true
+                        this.is_delete_all = true  //删除操作
+                        this.is_pay = true //结算操作
                     } else {
                         this.is_delete_all = false
+                        this.is_pay = false
                     }
                 },
                 myCart() {
