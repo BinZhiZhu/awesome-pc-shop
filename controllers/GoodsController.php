@@ -768,4 +768,47 @@ class GoodsController extends Controller
             ]
         ]);
     }
+
+
+    /**
+     * 获取商品详情
+     *
+     * @return object
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function actionGetGoodsDetail()
+    {
+        $id = Yii::$app->request->post('id');
+
+        $id = intval($id);
+
+        if (!$id) {
+            return Yii::createObject([
+                'class' => 'yii\web\Response',
+                'format' => \yii\web\Response::FORMAT_JSON,
+                'data' => [
+                    'code' => -200,
+                    'message' => '找不到商品',
+                    'result' => []
+                ]
+            ]);
+        }
+
+        $goods = GoodsEntity::findOne([
+            'id' => $id
+        ]);
+
+        return Yii::createObject([
+            'class' => 'yii\web\Response',
+            'format' => \yii\web\Response::FORMAT_JSON,
+            'data' => [
+                'code' => 200,
+                'message' => '',
+                'result' => $goods
+            ]
+        ]);
+
+
+    }
+
 }

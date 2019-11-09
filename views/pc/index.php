@@ -429,7 +429,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                             <div>商品已售数量: {{chooseGoods.sell_num}}</div>
                             <div>购买数量:
                                 &nbsp&nbsp&nbsp
-                                <el-input-number v-model="num" size="small" @change="handleChange" :min="1" :max="10"
+                                <el-input-number v-model="num" size="small" @change="handleChange" :min="1" :max="1000"
                                                  label=""></el-input-number>
                             </div>
                             <span slot="footer" class="dialog-footer">
@@ -504,7 +504,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                             <div>商品价格: <span style="color: red">{{chooseCartGoods.price}}</span></div>
                             <div>购买数量:
                                 &nbsp&nbsp&nbsp
-                                <el-input-number v-model="chooseCartGoods.num" size="small" @change="handleChange" :min="1" :max="10"
+                                <el-input-number v-model="chooseCartGoods.num" size="small" @change="handleChange" :min="1" :max="1000"
                                                  label=""></el-input-number>
                             </div>
                             <span slot="footer" class="dialog-footer">
@@ -851,6 +851,7 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                             console.log(error)
                         });
                 },
+                //立即购买
                 buyNow(id) {
                     let url = '<?php echo \yii\helpers\Url::toRoute('order/create-order');?>';
                     let param = new URLSearchParams();
@@ -864,6 +865,29 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                                 this.$message.success(resp.message);
                                 this.centerDialogVisible = false
                                 this.num = 1;
+                                this.getGoodsList()
+                                this.getGoodsCategoryList()
+                            } else {
+                                this.$message.success(resp.message);
+                                //刷新一下数据 更新库存
+                            }
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        });
+                },
+                //根据商品ID去获取商品详情
+                getGoodsDetailByGoodsId(id){
+                    let url = '<?php echo \yii\helpers\Url::toRoute('goods/get-goods-detail');?>';
+                    let param = new URLSearchParams();
+                    param.append('id', id);
+                    axios.post(url, param)
+                        .then(response => {
+                            const resp = response.data;
+                            console.log('获取商品详情结果', resp);
+                            return
+                            if (resp.code === 200) {
+                                this.chooseGoods = resp
                             } else {
                                 this.$message.success(resp.message);
                             }
