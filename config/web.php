@@ -34,11 +34,11 @@ $config = [
             'identityClass' => 'app\models\User',
             'enableAutoLogin' => true,
         ],
-        'session' => [
-            'class' =>'yii\web\session',
-            'timeout' => 60 * 60 * 24 * 30,
-            'cookieParams' => ['lifetime' => 30 * 24 * 60 * 60]
-        ],
+//        'session' => [
+//            'class' =>'yii\web\session',
+//            'timeout' => 60 * 60 * 24 * 30,
+//            'cookieParams' => ['lifetime' => 30 * 24 * 60 * 60]
+//        ],
             'errorHandler' => [
         //    'errorAction' => 'site/error',
         ],

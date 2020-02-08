@@ -272,10 +272,12 @@ $this->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 're
                     this.alertMessage('请选择角色', true, 'error');
                 }
 
-                if(this.loginForm.role === 1){
-                    this.alertMessage('管理员不能注册哦', true, 'error');
-                    return;
-                }
+                console.log('this.loginForm.role',this.loginForm.role)
+
+                // if(this.loginForm.role === 1){
+                //     this.alertMessage('管理员不能注册哦', true, 'error');
+                //     return;
+                // }
                 const postdata = {
                     username: this.loginForm.username,
                     password: this.loginForm.password,
